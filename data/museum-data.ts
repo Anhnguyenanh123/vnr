@@ -88,58 +88,47 @@ export const roomQuizzes: RoomQuiz[] = [
     questions: [
       {
         question:
-          "Sau Cách mạng Tháng Tám năm 1945, chế độ chính trị nào được xác lập ở Việt Nam?",
+          "Mục tiêu chính của cuộc tập kích chiến lược của Mỹ tháng 12/1972 là gì?",
         options: [
-          "Chế độ dân chủ nhân dân",
-          "Chế độ quân chủ lập hiến",
-          "Chế độ phong kiến cải lương",
-          "Chế độ tư sản dân quyền",
+          "Hủy diệt lực lượng không quân Việt Nam",
+          "Buộc Việt Nam Dân chủ Cộng hòa khuất phục trên bàn đàm phán Paris",
+          "Hỗ trợ quân đội miền Nam Việt Nam",
+          "Kiểm soát tuyến đường Hồ Chí Minh",
         ],
-        correctAnswer: 0,
+        correctAnswer: 1,
+      },
+      {
+        question: "Cuộc tập kích kéo dài bao nhiêu ngày đêm?",
+        options: ["7 ngày đêm", "12 ngày đêm", "18 ngày đêm", "30 ngày đêm"],
+        correctAnswer: 1,
       },
       {
         question:
-          "Sau khi thống nhất đất nước năm 1976, tên nước chính thức của Việt Nam là gì?",
+          "Quân dân miền Bắc đã bắn rơi tổng cộng bao nhiêu máy bay Mỹ trong chiến dịch này?",
+        options: ["34 chiếc", "81 chiếc", "100 chiếc", "50 chiếc"],
+        correctAnswer: 1,
+      },
+      {
+        question:
+          "Chiến thắng 'Điện Biên Phủ trên không' đã buộc Mỹ ký hiệp định nào?",
         options: [
-          "Việt Nam Dân chủ Cộng hòa",
-          "Cộng hòa xã hội chủ nghĩa Việt Nam",
-          "Liên bang Việt Nam",
-          "Cộng hòa Việt Nam",
+          "Hiệp định Genève",
+          "Hiệp định Paris ngày 27/1/1973",
+          "Hiệp định Sơ bộ 1946",
+          "Hiệp định Potsdam",
         ],
         correctAnswer: 1,
       },
       {
         question:
-          "Đại hội nào của Đảng khởi xướng công cuộc Đổi mới và nhấn mạnh phát huy dân chủ?",
+          "Ngày nào Tổng thống Nixon phê duyệt kế hoạch tấn công bằng đường không vào Hà Nội và Hải Phòng?",
         options: [
-          "Đại hội V",
-          "Đại hội VI (1986)",
-          "Đại hội VII",
-          "Đại hội VIII",
+          "Ngày 18 tháng 12 năm 1972",
+          "Ngày 14 tháng 12 năm 1972",
+          "Ngày 26 tháng 12 năm 1972",
+          "Ngày 27 tháng 1 năm 1973",
         ],
         correctAnswer: 1,
-      },
-      {
-        question:
-          "Theo Đảng ta, dân chủ xã hội chủ nghĩa là bản chất của chế độ ta, đồng thời còn là gì?",
-        options: [
-          "Công cụ đấu tranh chính trị",
-          "Mục tiêu và động lực phát triển đất nước",
-          "Biểu hiện của kinh tế thị trường",
-          "Cơ chế quản lý tập trung",
-        ],
-        correctAnswer: 1,
-      },
-      {
-        question:
-          "Để dân chủ phát huy hiệu quả, cần gắn liền với yếu tố nào sau đây?",
-        options: [
-          "Kỷ luật, kỷ cương và pháp luật (thể chế hóa)",
-          "Tập quán địa phương",
-          "Tình cảm xã hội",
-          "Truyền thống gia đình",
-        ],
-        correctAnswer: 0,
       },
     ],
   },
@@ -147,57 +136,47 @@ export const roomQuizzes: RoomQuiz[] = [
     roomNumber: 2,
     questions: [
       {
-        question: "Bản chất của nền dân chủ xã hội chủ nghĩa ở Việt Nam là gì?",
-        options: [
-          "Dân chủ do cá nhân lãnh đạo",
-          "Dân chủ do nhân dân làm chủ, quyền lực thuộc về nhân dân",
-          "Dân chủ dựa vào giai cấp tư sản",
-          "Dân chủ tập trung vào nhà nước",
-        ],
+        question: "Đài Tiếng nói Việt Nam (VOV) bị tấn công vào đêm ngày nào?",
+        options: ["14 tháng 12", "18 tháng 12", "26 tháng 12", "27 tháng 1"],
         correctAnswer: 1,
       },
       {
         question:
-          "Tư tưởng Hồ Chí Minh về dân chủ thể hiện rõ nhất qua câu nói nào sau đây?",
+          "Sau khi bị tấn công, Đài Tiếng nói Việt Nam tiếp tục phát sóng sau bao lâu?",
         options: [
-          "Dân chủ là để dân bàn việc của dân",
-          "Nước ta là nước dân chủ, bao nhiêu lợi ích đều vì dân, bao nhiêu quyền hạn đều là của dân",
-          "Nhà nước là công cụ của Đảng",
-          "Nhân dân là đối tượng quản lý của Nhà nước",
+          "9 phút im lặng",
+          "1 giờ im lặng",
+          "9 giờ im lặng",
+          "1 ngày im lặng",
+        ],
+        correctAnswer: 0,
+      },
+      {
+        question:
+          "Các cuộc không kích của Mỹ chủ yếu nhắm vào những mục tiêu nào?",
+        options: [
+          "Chỉ các mục tiêu quân sự",
+          "Các mục tiêu dân sự như khu dân cư, bệnh viện",
+          "Chỉ các sân bay không quân",
+          "Các tuyến đường bộ",
         ],
         correctAnswer: 1,
       },
       {
-        question:
-          "Dân chủ gián tiếp ở nước ta được thể hiện chủ yếu thông qua cơ quan nào?",
-        options: [
-          "Quốc hội và Hội đồng nhân dân các cấp",
-          "Chính phủ và các bộ ngành",
-          "Mặt trận Tổ quốc Việt Nam",
-          "Tổ chức Đảng và Đoàn thể",
-        ],
-        correctAnswer: 0,
+        question: "Phố Khâm Thiên bị đổ nát vào đêm ngày nào?",
+        options: ["14 tháng 12", "18 tháng 12", "26 tháng 12", "27 tháng 1"],
+        correctAnswer: 2,
       },
       {
         question:
-          "Hình thức dân chủ trực tiếp được nhân dân thể hiện bằng cách nào?",
+          "Tổng số người thiệt mạng ở phố Khâm Thiên là bao nhiêu, chủ yếu là ai?",
         options: [
-          "Tham gia bầu cử, giám sát, phản biện, kiểm tra hoạt động của Nhà nước",
-          "Chỉ thông qua ý kiến gửi Đảng và Quốc hội",
-          "Qua mạng xã hội và báo chí",
-          "Qua đóng góp tài chính vào ngân sách",
+          "178 người, chủ yếu là nam giới",
+          "278 người, chủ yếu là phụ nữ, người già và trẻ em",
+          "378 người, chủ yếu là binh sĩ",
+          "100 người, chủ yếu là trẻ em",
         ],
-        correctAnswer: 0,
-      },
-      {
-        question: "Phương châm cơ bản trong thực hiện dân chủ ở cơ sở là gì?",
-        options: [
-          "Dân biết, dân bàn, dân làm, dân kiểm tra",
-          "Dân hỏi – chính quyền trả lời",
-          "Đảng quyết – dân làm",
-          "Nhà nước làm – dân giám sát",
-        ],
-        correctAnswer: 0,
+        correctAnswer: 1,
       },
     ],
   },
@@ -206,55 +185,106 @@ export const roomQuizzes: RoomQuiz[] = [
     questions: [
       {
         question:
-          "Thượng tôn pháp luật trong Nhà nước pháp quyền xã hội chủ nghĩa có nghĩa là gì?",
+          "Trong cuộc không kích, người dân Hà Nội đã làm gì để bảo vệ tính mạng?",
         options: [
-          "Pháp luật giữ vị trí tối thượng, điều chỉnh mọi quan hệ xã hội",
-          "Pháp luật phụ thuộc vào ý chí của Đảng",
-          "Mỗi địa phương có thể tự ra luật riêng",
-          "Luật chỉ áp dụng cho cơ quan nhà nước",
+          "Tiếp tục sinh hoạt bình thường",
+          "Sơ tán đến nơi an toàn và xây dựng hầm trú bom",
+          "Di chuyển đến miền Nam",
+          "Ẩn náu trong các tòa nhà cao tầng",
+        ],
+        correctAnswer: 1,
+      },
+      {
+        question: "Các hầm trú bom được dựng ở đâu?",
+        options: [
+          "Trong các bệnh viện",
+          "Ven đường cá nhân dọc theo các con phố",
+          "Dưới các trường học",
+          "Tại các ga tàu",
+        ],
+        correctAnswer: 1,
+      },
+      {
+        question:
+          "Lực lượng nào đã trực chiến mạnh mẽ chống lại các cuộc không kích?",
+        options: [
+          "Lực lượng bộ binh",
+          "Lính pháo binh và đơn vị không quân Sao Đỏ",
+          "Lực lượng hải quân",
+          "Dân quân tự vệ địa phương",
+        ],
+        correctAnswer: 1,
+      },
+      {
+        question:
+          "Tinh thần của quân dân miền Bắc trong cuộc kháng cự được thể hiện như thế nào?",
+        options: [
+          "Sẵn sàng đầu hàng",
+          "Ngày đêm sẵn sàng chiến đấu với quyết tâm sắt đá",
+          "Chỉ phòng thủ thụ động",
+          "Yêu cầu đàm phán ngay lập tức",
+        ],
+        correctAnswer: 1,
+      },
+      {
+        question:
+          "Nhân dân Hà Nội thể hiện tinh thần gì dù đối mặt với bom đạn ác liệt?",
+        options: [
+          "Hoảng loạn và chạy trốn",
+          "Kiên cường, tổ chức sơ tán và trú ẩn hiệu quả",
+          "Tấn công trực tiếp vào máy bay Mỹ",
+          "Bỏ chạy khỏi thành phố",
+        ],
+        correctAnswer: 1,
+      },
+    ],
+  },
+  {
+    roomNumber: 4,
+    questions: [
+      {
+        question: "Anh hùng Phạm Tuân đã lái loại máy bay nào để bắn rơi B-52?",
+        options: [
+          "Máy bay B-52",
+          "Máy bay MiG-21",
+          "Máy bay F-111",
+          "Máy bay Stratofortress",
+        ],
+        correctAnswer: 1,
+      },
+      {
+        question: "Một phi công Mỹ bị bắt ở đâu tại Hà Nội?",
+        options: [
+          "Sân bay Nội Bài",
+          "Hồ Trúc Bạch",
+          "Phố Khâm Thiên",
+          "Bệnh viện Bạch Mai",
+        ],
+        correctAnswer: 1,
+      },
+      {
+        question: "Các phi công Mỹ bị bắt được giam giữ ở đâu?",
+        options: [
+          "Nhà tù Hỏa Lò",
+          "Trại giam Phú Quốc",
+          "Đài Tiếng nói Việt Nam",
+          "Hầm trú bom",
         ],
         correctAnswer: 0,
       },
       {
-        question: "Quyền lực nhà nước ở Việt Nam được tổ chức như thế nào?",
-        options: [
-          "Thống nhất quyền lực, có sự phân công – phối hợp – kiểm soát giữa lập pháp, hành pháp, tư pháp",
-          "Phân lập cứng ba quyền, không phối hợp",
-          "Tập trung tuyệt đối vào hành pháp",
-          "Do Quốc hội nắm toàn bộ quyền lực",
-        ],
+        question: "Hiệp định Paris được ký vào ngày nào năm 1973?",
+        options: ["27 tháng 1", "14 tháng 12", "18 tháng 12", "26 tháng 12"],
         correctAnswer: 0,
       },
       {
         question:
-          "Nhà nước pháp quyền xã hội chủ nghĩa Việt Nam đặt dưới sự lãnh đạo của ai?",
+          "Ai là người ký Hiệp định Paris đại diện cho Chính phủ Cách mạng Lâm thời Cộng hòa miền Nam Việt Nam?",
         options: [
-          "Chính phủ",
-          "Quốc hội",
-          "Đảng Cộng sản Việt Nam",
-          "Nhân dân địa phương",
-        ],
-        correctAnswer: 2,
-      },
-      {
-        question:
-          "Đặc trưng nổi bật của Nhà nước pháp quyền xã hội chủ nghĩa Việt Nam là gì?",
-        options: [
-          "Tôn trọng và bảo vệ quyền con người, coi con người là trung tâm của sự phát triển",
-          "Tập trung mọi quyền vào một cơ quan duy nhất",
-          "Không có sự kiểm soát quyền lực",
-          "Phân quyền tuyệt đối giữa các cấp",
-        ],
-        correctAnswer: 0,
-      },
-      {
-        question:
-          "Đấu tranh phòng, chống tham nhũng và thực hành tiết kiệm nhằm mục tiêu gì?",
-        options: [
-          "Tăng nguồn thu ngân sách",
-          "Giữ vững kỷ cương, củng cố niềm tin của nhân dân và nâng cao hiệu lực của Nhà nước pháp quyền",
-          "Giảm chi phí hành chính",
-          "Tạo hình ảnh tốt với quốc tế",
+          "Tổng thống Nixon",
+          "Bà Nguyễn Thị Bình",
+          "Anh hùng Phạm Tuân",
+          "Tổng Bí thư Lê Duẩn",
         ],
         correctAnswer: 1,
       },
