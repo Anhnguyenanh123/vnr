@@ -4,10 +4,9 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Bảo tàng Chủ nghĩa Xã hội Khoa học",
+  title: "Bảo tàng Điện Biên Phủ Trên Không",
   description:
-    "Khám phá dân chủ xã hội chủ nghĩa và nhà nước pháp quyền xã hội chủ nghĩa ở Việt Nam",
-  generator: "v0.app",
+    "Khám phá 12 ngày đêm khói lửa Hà Nội tháng 12/1972 - Chiến thắng vang dội đánh bại cuộc tập kích chiến lược của Mỹ",
 };
 
 export default function RootLayout({
