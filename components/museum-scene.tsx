@@ -211,10 +211,10 @@ export default function MuseumScene({
         }
 
         this.playerMovement = new PlayerMovement(this, username);
-        
+
         const startX = playerPositionRef.current?.x || 400;
         const startY = playerPositionRef.current?.y || 400;
-        
+
         const player = this.playerMovement.createPlayer(startX, startY);
 
         this.cameras.main.startFollow(player, true, 0.1, 0.1);
@@ -222,7 +222,7 @@ export default function MuseumScene({
 
         this.map = this.make.tilemap({ key: "map1" });
         const tileset1 = this.map.addTilesetImage("room", "room")!;
-        const tileset2 = this.map.addTilesetImage("interior", "interior")!;;;
+        const tileset2 = this.map.addTilesetImage("interior", "interior")!;
 
         this.layer1 = this.map.createLayer(
           "layer1",
@@ -347,7 +347,10 @@ export default function MuseumScene({
           )
         );
 
-        const totalWidth = this.map.widthInPixels + this.map2.widthInPixels + this.map3.widthInPixels;
+        const totalWidth =
+          this.map.widthInPixels +
+          this.map2.widthInPixels +
+          this.map3.widthInPixels;
         const cameraHeight = Math.max(
           this.map.heightInPixels,
           this.map2.heightInPixels,
@@ -430,7 +433,7 @@ export default function MuseumScene({
         if (this.roomBorders && this.roomBorders.room3Border) {
           this.physics.add.collider(player, this.roomBorders.room3Border);
         }
-        
+
         this.roomTriggers = {
           1: new Phaser.Geom.Rectangle(40, 260, 1380, 680),
           2: new Phaser.Geom.Rectangle(1480, 260, 1380, 680),
@@ -475,19 +478,13 @@ export default function MuseumScene({
             this.roomBorders.room2Border &&
             this.roomBorders.room2Border.body
           ) {
-            this.physics.add.collider(
-              player,
-              this.roomBorders.room2Border
-            );
+            this.physics.add.collider(player, this.roomBorders.room2Border);
           }
           if (
             this.roomBorders.room3Border &&
             this.roomBorders.room3Border.body
           ) {
-            this.physics.add.collider(
-              player,
-              this.roomBorders.room3Border
-            );
+            this.physics.add.collider(player, this.roomBorders.room3Border);
           }
         }
 
@@ -590,49 +587,48 @@ export default function MuseumScene({
             x: sectionWidth * 0.5,
             y: 100,
             id: 1,
-            imagePath: "/pic/r1-e1.webp",
+            imagePath: "/pic/r1-e3.jpg",
             caption:
-              "Lao động và bóc lột trong chế độ tư bản. Hình ảnh thể hiện sự tương phản giữa giai cấp tư sản và giai cấp vô sản trong xã hội tư bản.",
+              "Đài phát thanh Mễ Trì của Đài Tiếng nói Việt Nam (VOV) bị tấn công vào đêm 18 tháng 12. Mặc dù thiệt hại về tài sản nặng nề, VOV vẫn tiếp tục phát sóng sau 9 phút im lặng.",
           },
           {
             x: sectionWidth * 1.5,
             y: 100,
             id: 2,
-            imagePath: "/pic/r1-e2.jpg",
+            imagePath: "/pic/r1-e4.jpg",
             caption:
-              "Đại hội lần thứ nhất của Đảng Cộng sản Việt Nam năm 1935. Sự kiện quan trọng trong lịch sử cách mạng Việt Nam.",
+              "Các hầm trú bom ven đường cá nhân được dựng lên dọc theo các con phố.",
           },
           {
             x: sectionWidth * 2.5,
             y: 100,
             id: 3,
-            imagePath: "/pic/r1-e3.jpg",
+            imagePath: "/pic/r2-e3.jpg",
             caption:
-              "Chủ tịch Hồ Chí Minh - người anh hùng dân tộc và nhà cách mạng vĩ đại, người sáng lập Đảng Cộng sản Việt Nam.",
+              "Đơn vị không quân Sao Đỏ đã góp phần vào chiến thắng của trận chiến.",
           },
           {
             x: sectionWidth * 3.5,
             y: 100,
             id: 4,
-            imagePath: "/pic/r1-e4.webp",
-            caption:
-              "Sự phát triển của lực lượng sản xuất và quan hệ sản xuất. Minh họa cho quy luật cơ bản của sự phát triển xã hội loài người.",
+            imagePath: "/pic/r1-e5.jpg",
+            caption: "Một phi công Mỹ bị bắt trên hồ Trúc Bạch ở Hà Nội.",
           },
           {
             x: sectionWidth * 4.5,
             y: 100,
             id: 5,
-            imagePath: "/pic/r2-e1.jpg",
+            imagePath: "/pic/r1-e6.jpg",
             caption:
-              "Cuộc cách mạng Tháng Mười Nga 1917. Sự kiện lịch sử đánh dấu sự ra đời của nhà nước xã hội chủ nghĩa đầu tiên trên thế giới.",
+              "Bữa ăn hàng ngày của các phi công bị bắt tại Nhà tù Hỏa Lò ở Hà Nội.",
           },
           {
             x: sectionWidth * 5.5,
             y: 100,
             id: 6,
-            imagePath: "/pic/r2-e2.jpg",
+            imagePath: "/pic/r1-e7.jpg",
             caption:
-              "Mác-Lênin chủ nghĩa và sự vận dụng sáng tạo trong điều kiện cụ thể của Việt Nam.",
+              "Thất bại của các cuộc không kích đã buộc Mỹ và tay sai phải ngồi vào bàn đàm phán năm 1973 và ký Hiệp định Paris, chấm dứt chiến tranh ở Việt Nam. Trong ảnh, bà Nguyễn Thị Bình, Bộ trưởng Ngoại giao Chính phủ Cách mạng Lâm thời Cộng hòa miền Nam Việt Nam, đã ký hiệp định vào ngày 27 tháng 1 năm 1973.",
           },
         ];
 
@@ -1075,13 +1071,12 @@ export default function MuseumScene({
           3: {
             x: this.map.widthInPixels + this.map2.widthInPixels + 100,
             y: 480,
-          }, 
+          },
         };
 
         if (roomNumber === 2) {
           const targetPos = teleportPositions[2];
           const player = this.playerMovement.getPlayer();
-
 
           const teleportEffect = this.add.circle(
             player.x,
@@ -1212,7 +1207,7 @@ export default function MuseumScene({
 
       update() {
         if (!this.playerMovement) return;
-        
+
         this.playerMovement.update();
         const player = this.playerMovement.getPlayer();
 
@@ -1298,21 +1293,21 @@ export default function MuseumScene({
           this.promptText.setText("Nhấn E để làm quiz tổng hợp");
           this.promptText.setVisible(true);
           this.promptText.setPosition(
-            this.sys.game.config.width as number / 2,
+            (this.sys.game.config.width as number) / 2,
             (this.sys.game.config.height as number) - 60
           );
         } else if (this.nearInfoPoint !== null) {
           this.promptText.setText("Nhấn E để xem thông tin");
           this.promptText.setVisible(true);
           this.promptText.setPosition(
-            this.sys.game.config.width as number / 2,
+            (this.sys.game.config.width as number) / 2,
             (this.sys.game.config.height as number) - 60
           );
         } else if (this.nearPicture !== null) {
           this.promptText.setText("Nhấn E để xem bức tranh");
           this.promptText.setVisible(true);
           this.promptText.setPosition(
-            this.sys.game.config.width as number / 2,
+            (this.sys.game.config.width as number) / 2,
             (this.sys.game.config.height as number) - 60
           );
         } else if (this.nearLockedDoor !== null) {
@@ -1321,7 +1316,7 @@ export default function MuseumScene({
           );
           this.promptText.setVisible(true);
           this.promptText.setPosition(
-            this.sys.game.config.width as number / 2,
+            (this.sys.game.config.width as number) / 2,
             (this.sys.game.config.height as number) - 60
           );
         } else {

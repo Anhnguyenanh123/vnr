@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { X } from "lucide-react";
 import type { ExhibitData } from "@/types/museum";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";

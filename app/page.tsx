@@ -160,12 +160,6 @@ export default function MuseumPage() {
     setCurrentQuizRoom(null);
   }, []);
 
-  const handleLogout = useCallback(() => {
-    setCurrentPlayer(null);
-    setShowStartScreen(true);
-    setShowInstructions(false);
-  }, []);
-
   const handleDoorInteract = useCallback((roomNumber: number) => {
     const quizRoomNumber = roomNumber - 1;
     setCurrentQuizRoom(quizRoomNumber);
