@@ -4,11 +4,22 @@ import { useEffect, useRef, useState } from "react";
 const PhaserLib = typeof window !== "undefined" ? require("phaser") : null;
 type Phaser = typeof import("phaser");
 import type { ExhibitData } from "@/types/museum";
-import { museumData } from "@/data/museum-data";
 import PictureModal from "@/components/picture-modal";
 import { PlayerMovement } from "@/components/player-movement";
-import { MuseumMapDisplay } from "@/components/museum-map-display";
 import { ChatBox } from "@/components/chat-box";
+import { LeaderboardModal } from "@/components/leaderboard-modal";
+import { gameClient } from "@/lib/game-client";
+import { Player, ChatMessage } from "@/types/api";
+import { GraphicsCreator } from "@/components/game/graphics-creator";
+import { AnimationManager } from "@/components/game/animation-manager";
+import { RoomManager } from "@/components/game/room-manager";
+import { OtherPlayersManager } from "@/components/game/other-players-manager";
+import { PopupManager } from "@/components/game/popup-manager";
+import { SceneSetupManager } from "@/components/game/scene-setup-manager";
+import { RoomNavigationManager } from "@/components/game/room-navigation-manager";
+import { MapManager } from "@/components/game/map-manager";
+import { InteractiveElementsManager } from "@/components/game/interactive-elements-manager";
+import { InputManager } from "@/components/game/input-manager";
 
 interface MuseumSceneProps {
   onExhibitInteract: (exhibit: ExhibitData) => void;
@@ -34,15 +45,151 @@ export default function MuseumScene({
     x: 100,
     y: 480,
   });
+  const [isConnected, setIsConnected] = useState(false);
+  const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
+  const [otherPlayers, setOtherPlayers] = useState<Map<string, Player>>(
+    new Map()
+  );
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+
+  useEffect(() => {
+    const connectToServer = async () => {
+      try {
+        await gameClient.connect();
+        setIsConnected(true);
+
+        const joinResult = await gameClient.joinGame(username);
+        setCurrentPlayer(joinResult.player);
+        (window as any).currentPlayer = joinResult.player;
+        (window as any).pendingExistingPlayers = joinResult.existingPlayers;
+
+        gameClient.onPlayerJoined((newPlayer) => {
+          setOtherPlayers((prev) => new Map(prev).set(newPlayer.id, newPlayer));
+        });
+
+        gameClient.onPlayerMoved((movedPlayer) => {
+          setOtherPlayers((prev) =>
+            new Map(prev).set(movedPlayer.id, movedPlayer)
+          );
+        });
+
+        gameClient.onPlayerDisconnected((playerId) => {
+          setOtherPlayers((prev) => {
+            const newMap = new Map(prev);
+            newMap.delete(playerId);
+            return newMap;
+          });
+
+          if (phaserGameRef.current) {
+            const scene = phaserGameRef.current.scene.getScene(
+              "MainScene"
+            ) as any;
+            if (scene && scene.removePlayer) {
+              scene.removePlayer(playerId);
+            }
+          }
+        });
+
+        gameClient.onChatMessage((message) => {
+          setChatMessages((prev) => [...prev, message]);
+          const chatBox = (window as any).chatBoxInstance;
+          if (chatBox && chatBox.addServerMessage) {
+            chatBox.addServerMessage(message);
+          }
+        });
+
+        gameClient.onError((error) => {
+          console.error("Game client error:", error);
+          if (error.includes("đã tồn tại")) {
+            alert("Tên người dùng đã tồn tại. Vui lòng chọn tên khác.");
+            window.location.reload();
+          }
+        });
+
+        gameClient.onGameCompleted((data) => {
+          const scene = phaserGameRef.current?.scene.getScene(
+            "MainScene"
+          ) as any;
+          if (scene && scene.showCompletionMessage) {
+            scene.showCompletionMessage(data.rank, data.time);
+          }
+        });
+
+        gameClient.onLeaderboardUpdated((data) => {
+          const scene = phaserGameRef.current?.scene.getScene(
+            "MainScene"
+          ) as any;
+          if (scene && scene.updateLeaderboard) {
+            scene.updateLeaderboard(data.leaderboard);
+          }
+        });
+      } catch (error) {
+        console.error("Connection error:", error);
+        if (error instanceof Error && error.message.includes("đã tồn tại")) {
+          alert("Tên người dùng đã tồn tại. Vui lòng chọn tên khác.");
+          window.location.reload();
+        }
+      }
+    };
+
+    connectToServer();
+
+    const handlePlayerMove = (event: CustomEvent) => {
+      const { x, y } = event.detail;
+      try {
+        gameClient.movePlayer(x, y);
+      } catch (error) {
+        console.error("Error moving player:", error);
+      }
+    };
+
+    window.addEventListener("playerMove", handlePlayerMove as EventListener);
+
+    const handleToggleLeaderboard = () => {
+      setShowLeaderboard((prev) => !prev);
+    };
+
+    window.addEventListener("toggleLeaderboard", handleToggleLeaderboard);
+
+    const handleQuizComplete = () => {
+      if (gameClient.isConnected()) {
+        gameClient.finishGame();
+      }
+    };
+
+    window.addEventListener(
+      "quizCompleted",
+      handleQuizComplete as EventListener
+    );
+
+    return () => {
+      gameClient.disconnect();
+      window.removeEventListener(
+        "playerMove",
+        handlePlayerMove as EventListener
+      );
+      window.removeEventListener("toggleLeaderboard", handleToggleLeaderboard);
+      window.removeEventListener(
+        "quizCompleted",
+        handleQuizComplete as EventListener
+      );
+    };
+  }, [username]);
 
   useEffect(() => {
     if (!gameRef.current || phaserGameRef.current || !PhaserLib) return;
+
+    (window as any).setOtherPlayersFromScene = (
+      playersMap: Map<string, Player>
+    ) => {
+      setOtherPlayers(playersMap);
+    };
 
     const Phaser = PhaserLib as unknown as Phaser;
 
     class MainScene extends Phaser.Scene {
       private playerMovement!: PlayerMovement;
-      private mapDisplay!: MuseumMapDisplay;
       private nearExhibit: ExhibitData | null = null;
       private nearLockedDoor: number | null = null;
       private nearPicture: {
@@ -52,38 +199,26 @@ export default function MuseumScene({
       } | null = null;
       private nearInfoPoint: ExhibitData | null = null;
       private interactKey!: Phaser.Input.Keyboard.Key;
+      private finishKey!: Phaser.Input.Keyboard.Key;
+      private tabKey!: Phaser.Input.Keyboard.Key;
       private promptText!: Phaser.GameObjects.Text;
       private chatBox!: ChatBox;
-      private exhibits: Phaser.Physics.Arcade.Sprite[] = [];
-      private infoPoints: {
-        exhibit: ExhibitData;
-        sprite: Phaser.GameObjects.Sprite;
-      }[] = [];
-      private quizPoint: {
-        collision: Phaser.GameObjects.Rectangle;
-        sprite: Phaser.GameObjects.Sprite;
-      } | null = null;
       private nearQuizPoint: boolean = false;
+      private quizCompleted: boolean = false;
       private currentRoom: number = 1;
       private roomTriggers: { [key: number]: Phaser.Geom.Rectangle } = {};
       private lockedDoors: {
         collision: Phaser.GameObjects.Rectangle;
         roomNumber: number;
       }[] = [];
-      private pictures: {
-        collision: Phaser.GameObjects.Rectangle;
-        id: number;
-        imagePath: string;
-        caption: string;
-      }[] = [];
-      private columns: {
-        collision: Phaser.GameObjects.Rectangle;
-        roomNumber: number;
-        title: string;
-      }[] = [];
       private roomBorders: {
         room2Border: Phaser.GameObjects.Rectangle;
         room3Border: Phaser.GameObjects.Rectangle;
+      } | null = null;
+      private finishLine: {
+        collision: Phaser.GameObjects.Rectangle;
+        area: Phaser.GameObjects.Rectangle;
+        text: Phaser.GameObjects.Text;
       } | null = null;
       private backButtons: {
         bg: Phaser.GameObjects.Rectangle;
@@ -95,6 +230,11 @@ export default function MuseumScene({
         text: Phaser.GameObjects.Text;
         room: number;
       }[] = [];
+      private nearFinishLine: boolean = false;
+      private completionMessage: Phaser.GameObjects.Text | null = null;
+      private leaderboardDisplay: Phaser.GameObjects.Text | null = null;
+      private roomsUnlockedByQuiz: Set<number> = new Set();
+
       private topBorder!: Phaser.GameObjects.Rectangle;
       private map!: Phaser.Tilemaps.Tilemap;
       private layer1!: Phaser.Tilemaps.TilemapLayer;
@@ -107,6 +247,38 @@ export default function MuseumScene({
       private map3wall!: Phaser.Tilemaps.TilemapLayer;
       private map3floor1!: Phaser.Tilemaps.TilemapLayer;
       private map3floor2!: Phaser.Tilemaps.TilemapLayer;
+
+      private infoPoints: {
+        exhibit: ExhibitData;
+        sprite: Phaser.GameObjects.Sprite;
+      }[] = [];
+      private quizPoint: {
+        collision: Phaser.GameObjects.Rectangle;
+        sprite: Phaser.GameObjects.Sprite;
+      } | null = null;
+      private pictures: {
+        collision: Phaser.GameObjects.Rectangle;
+        id: number;
+        imagePath: string;
+        caption: string;
+      }[] = [];
+
+      private roomManager!: RoomManager;
+      private otherPlayersManager!: OtherPlayersManager;
+      private popupManager!: PopupManager;
+      private sceneSetupManager!: SceneSetupManager;
+      private mapManager!: MapManager;
+      private interactiveElementsManager!: InteractiveElementsManager;
+      private inputManager!: InputManager;
+      private roomNavigationManager!: RoomNavigationManager;
+
+      private currentPopup: {
+        overlay?: Phaser.GameObjects.Rectangle;
+        bg?: Phaser.GameObjects.Rectangle;
+        text?: Phaser.GameObjects.Text;
+        button?: Phaser.GameObjects.Rectangle;
+        buttonText?: Phaser.GameObjects.Text;
+      } | null = null;
 
       constructor() {
         super({ key: "MainScene" });
@@ -129,61 +301,28 @@ export default function MuseumScene({
           "/tiles/antarcticbees_interior_free_sample-export.png"
         );
 
-        this.createInfoPointGraphic();
-        this.createQuizPointGraphic();
-      }
-
-      createInfoPointGraphic() {
-        const graphics = this.make.graphics({ x: 0, y: 0 });
-
-        graphics.fillStyle(0x3b82f6, 1);
-        graphics.fillCircle(40, 40, 35);
-
-        graphics.fillStyle(0xffffff, 1);
-        graphics.fillCircle(40, 25, 5);
-        graphics.fillRect(35, 35, 10, 25);
-
-        graphics.generateTexture("info-point", 80, 80);
-        graphics.destroy();
-      }
-
-      createQuizPointGraphic() {
-        const graphics = this.make.graphics({ x: 0, y: 0 });
-        graphics.fillStyle(0xf59e0b, 1);
-        graphics.fillCircle(40, 40, 35);
-
-        graphics.fillStyle(0xffffff, 1);
-        graphics.fillTriangle(40, 15, 30, 35, 50, 35);
-        graphics.fillTriangle(40, 65, 30, 45, 50, 45);
-
-        graphics.generateTexture("quiz-point", 80, 80);
-        graphics.destroy();
+        GraphicsCreator.createInfoPointGraphic(this);
+        GraphicsCreator.createQuizPointGraphic(this);
       }
 
       create() {
-        this.physics.world.setBounds(0, 0, 9000, 1200);
+        this.roomManager = new RoomManager(this, unlockedRooms);
+        this.otherPlayersManager = new OtherPlayersManager(this, username);
+        this.popupManager = new PopupManager(this);
+        this.sceneSetupManager = new SceneSetupManager(this);
+        this.mapManager = new MapManager(this);
+        this.interactiveElementsManager = new InteractiveElementsManager(this);
+        this.inputManager = new InputManager(this);
 
-        for (let x = 0; x < 9000; x += 120) {
-          for (let y = 0; y < 1200; y += 120) {
-            const baseColor = (x + y) % 240 === 0 ? 0x374151 : 0x2d3748;
-            this.add.rectangle(x + 60, y + 60, 118, 118, baseColor);
-          }
-        }
-
-        this.add.rectangle(4500, 100, 800, 80, 0x0f3460);
-        this.add
-          .text(4500, 100, "BẢO TÀNG KHOA HỌC CHÍNH TRỊ", {
-            fontSize: "32px",
-            color: "#e8e8e8",
-            fontStyle: "bold",
-          })
-          .setOrigin(0.5);
+        this.sceneSetupManager.setupPhysicsWorld();
+        this.sceneSetupManager.createBaseFloor();
+        this.sceneSetupManager.createTitle();
 
         for (let i = 1; i <= 8; i++) {
           const x = i * 1000;
 
-          this.createWall(x, 250, 40, 460, 0x1e293b);
-          this.createWall(x, 950, 40, 460, 0x1e293b);
+          this.sceneSetupManager.createWall(x, 250, 40, 460, 0x1e293b);
+          this.sceneSetupManager.createWall(x, 950, 40, 460, 0x1e293b);
 
           if (!unlockedRooms.has(i + 1)) {
             const doorCollision = this.add.rectangle(
@@ -200,169 +339,63 @@ export default function MuseumScene({
               collision: doorCollision,
               roomNumber: i + 1,
             });
-
-            const lockIcon = this.add
-              .text(x, 600 - 120, "🔒", {
-                fontSize: "32px",
-              })
-              .setOrigin(0.5);
-            lockIcon.setDepth(10);
           }
         }
 
+        AnimationManager.createPlayerAnimations(this);
+
         this.playerMovement = new PlayerMovement(this, username);
+        this.roomNavigationManager = new RoomNavigationManager(
+          this,
+          this.playerMovement
+        );
 
         const startX = playerPositionRef.current?.x || 400;
         const startY = playerPositionRef.current?.y || 400;
 
         const player = this.playerMovement.createPlayer(startX, startY);
 
-        this.cameras.main.startFollow(player, true, 0.1, 0.1);
-        this.cameras.main.centerOn(player.x, player.y);
+        this.sceneSetupManager.setupCamera(player);
 
-        this.map = this.make.tilemap({ key: "map1" });
-        const tileset1 = this.map.addTilesetImage("room", "room")!;
-        const tileset2 = this.map.addTilesetImage("interior", "interior")!;
+        this.time.delayedCall(100, () => {
+          const pendingPlayers = (window as any).pendingExistingPlayers;
+          if (pendingPlayers && pendingPlayers.length > 0) {
+            const existingPlayersMap = new Map<string, Player>();
+            pendingPlayers.forEach((existingPlayer: Player) => {
+              existingPlayersMap.set(existingPlayer.id, existingPlayer);
+            });
 
-        this.layer1 = this.map.createLayer(
-          "layer1",
-          [tileset1, tileset2],
-          0,
-          0
-        )!;
-        this.layer2 = this.map.createLayer(
-          "layer2",
-          [tileset1, tileset2],
-          0,
-          0
-        )!;
-        this.layer3 = this.map.createLayer(
-          "layer3",
-          [tileset1, tileset2],
-          0,
-          0
-        )!;
+            if ((window as any).setOtherPlayersFromScene) {
+              (window as any).setOtherPlayersFromScene(existingPlayersMap);
+            }
 
-        this.layer1.setVisible(true);
-        this.layer2.setVisible(true);
-        this.layer3.setVisible(true);
+            (window as any).pendingExistingPlayers = null;
+          }
+        });
 
-        this.layer3.setDepth(0);
-        this.layer2.setDepth(1);
-        this.layer1.setDepth(2);
+        const { totalWidth, totalHeight } = this.mapManager.createAllMaps();
 
-        this.map2 = this.make.tilemap({ key: "map2" });
-        const map2tileset = this.map2.addTilesetImage(
-          "Dungeon_Tileset",
-          "Dungeon_Tileset"
-        )!;
+        this.map = this.mapManager.map;
+        this.layer1 = this.mapManager.layer1;
+        this.layer2 = this.mapManager.layer2;
+        this.layer3 = this.mapManager.layer3;
+        this.map2 = this.mapManager.map2;
+        this.map2wall = this.mapManager.map2wall;
+        this.map2floor = this.mapManager.map2floor;
+        this.map3 = this.mapManager.map3;
+        this.map3wall = this.mapManager.map3wall;
+        this.map3floor1 = this.mapManager.map3floor1;
+        this.map3floor2 = this.mapManager.map3floor2;
 
-        this.map2floor = this.map2.createLayer(
-          "Floor0",
-          [map2tileset],
-          this.map.widthInPixels,
-          0
-        )!;
-        this.map2wall = this.map2.createLayer(
-          "Floor1",
-          [map2tileset],
-          this.map.widthInPixels,
-          0
-        )!;
-
-        this.map2floor.setVisible(true);
-        this.map2wall.setVisible(true);
-
-        this.map2floor.setDepth(3);
-        this.map2wall.setDepth(4);
-
-        this.add
-          .rectangle(
-            this.map.widthInPixels + this.map2.widthInPixels / 2,
-            this.map2.heightInPixels / 2,
-            this.map2.widthInPixels,
-            this.map2.heightInPixels,
-            0xff0000,
-            0.3
-          )
-          .setDepth(6);
-
-        this.map3 = this.make.tilemap({ key: "map3" });
-
-        const map3tileset = this.map3.addTilesetImage(
-          "antarcticbees_interior_free_sample-export",
-          "antarcticbees_interior"
-        )!;
-
-        const map3OffsetX = this.map.widthInPixels + this.map2.widthInPixels;
-
-        this.map3floor1 = this.map3.createLayer(
-          "floor1",
-          [map3tileset],
-          map3OffsetX,
-          0
-        )!;
-        this.map3floor2 = this.map3.createLayer(
-          "floor2",
-          [map3tileset],
-          map3OffsetX,
-          0
-        )!;
-        this.map3wall = this.map3.createLayer(
-          "wall",
-          [map3tileset],
-          map3OffsetX,
-          0
-        )!;
-
-        this.map3floor1.setVisible(true);
-        this.map3floor2.setVisible(true);
-        this.map3wall.setVisible(true);
-
-        this.map3floor1.setDepth(5);
-        this.map3floor2.setDepth(6);
-        this.map3wall.setDepth(7);
-
-        this.add
-          .rectangle(
-            map3OffsetX + this.map3.widthInPixels / 2,
-            this.map3.heightInPixels / 2,
-            this.map3.widthInPixels,
-            this.map3.heightInPixels,
-            0x00ff00,
-            0.3
-          )
-          .setDepth(8);
-
-        this.physics.world.setBounds(
-          0,
-          0,
-          this.map.widthInPixels +
-            this.map2.widthInPixels +
-            this.map3.widthInPixels,
-          Math.max(
-            this.map.heightInPixels,
-            this.map2.heightInPixels,
-            this.map3.heightInPixels
-          )
-        );
-
-        const totalWidth =
-          this.map.widthInPixels +
-          this.map2.widthInPixels +
-          this.map3.widthInPixels;
-        const cameraHeight = Math.max(
-          this.map.heightInPixels,
-          this.map2.heightInPixels,
-          this.map3.heightInPixels
-        );
+        this.physics.world.setBounds(0, 0, totalWidth, totalHeight);
 
         const gamePlayer = this.playerMovement.getPlayer();
         if (gamePlayer) {
-          this.cameras.main.setZoom(0.9);
-          this.cameras.main.setBounds(0, 0, totalWidth, cameraHeight);
-          this.cameras.main.startFollow(gamePlayer, true, 1, 1);
-          this.cameras.main.centerOn(gamePlayer.x, gamePlayer.y);
+          this.sceneSetupManager.updateCameraBounds(
+            totalWidth,
+            totalHeight,
+            gamePlayer
+          );
         }
 
         this.topBorder = this.add.rectangle(
@@ -423,9 +456,17 @@ export default function MuseumScene({
 
         this.refreshBackButtons();
 
-        this.createInfoPoints();
-        this.createPictures();
-        this.createRoomBorders();
+        this.interactiveElementsManager.createInfoPoints();
+        this.interactiveElementsManager.createPictures();
+        this.roomBorders = this.roomManager.createRoomBorders(
+          this.map,
+          this.map2
+        );
+        this.interactiveElementsManager.createComprehensiveQuizPoint();
+
+        this.infoPoints = this.interactiveElementsManager.infoPoints;
+        this.quizPoint = this.interactiveElementsManager.quizPoint;
+        this.pictures = this.interactiveElementsManager.pictures;
 
         if (this.roomBorders && this.roomBorders.room2Border) {
           this.physics.add.collider(player, this.roomBorders.room2Border);
@@ -434,15 +475,21 @@ export default function MuseumScene({
           this.physics.add.collider(player, this.roomBorders.room3Border);
         }
 
-        this.roomTriggers = {
-          1: new Phaser.Geom.Rectangle(40, 260, 1380, 680),
-          2: new Phaser.Geom.Rectangle(1480, 260, 1380, 680),
-          3: new Phaser.Geom.Rectangle(2920, 260, 1380, 680),
-        };
+        this.roomTriggers = this.roomManager.createRoomTriggers();
 
         this.interactKey = this.input.keyboard!.addKey(
           Phaser.Input.Keyboard.KeyCodes.E
         );
+
+        this.finishKey = this.input.keyboard!.addKey(
+          Phaser.Input.Keyboard.KeyCodes.F
+        );
+
+        this.finishKey.on("down", () => {
+          if (this.nearFinishLine) {
+            this.popupManager.showFinalCompletionPopup();
+          }
+        });
 
         this.promptText = this.add
           .text(0, 0, "Nhấn E để xem nội dung", {
@@ -459,7 +506,7 @@ export default function MuseumScene({
         this.createChat();
 
         this.interactKey.on("down", () => {
-          if (this.nearQuizPoint) {
+          if (this.nearQuizPoint && !this.quizCompleted) {
             window.dispatchEvent(new Event("quizPointInteract"));
           } else if (this.nearInfoPoint !== null) {
             (window as any).handleExhibitInteract?.(this.nearInfoPoint);
@@ -470,6 +517,17 @@ export default function MuseumScene({
             );
           } else if (this.nearLockedDoor !== null) {
             (window as any).handleDoorInteract?.(this.nearLockedDoor);
+          }
+        });
+
+        this.tabKey = this.input.keyboard!.addKey(
+          Phaser.Input.Keyboard.KeyCodes.TAB
+        );
+
+        this.tabKey.on("down", () => {
+          const currentPlayer = (window as any).currentPlayer;
+          if (currentPlayer && currentPlayer.username === "admin1234509876") {
+            window.dispatchEvent(new Event("toggleLeaderboard"));
           }
         });
 
@@ -500,12 +558,6 @@ export default function MuseumScene({
         const columnCollision = this.add.rectangle(x, y, 60, 60, 0xff0000, 0);
         this.physics.add.existing(columnCollision, true);
 
-        this.columns.push({
-          collision: columnCollision,
-          roomNumber: roomNumber,
-          title: title,
-        });
-
         this.add
           .text(x, y + 50, title, {
             fontSize: "10px",
@@ -517,555 +569,27 @@ export default function MuseumScene({
           .setDepth(4);
       }
 
-      createRoomBorders() {
-        const room2BorderX = this.map.widthInPixels;
-        const room2BorderY = this.map.heightInPixels / 2;
-        const room2Border = this.add.rectangle(
-          room2BorderX,
-          room2BorderY,
-          20,
-          this.map.heightInPixels,
-          0xff0000,
-          0
-        );
-        this.physics.add.existing(room2Border, true);
-
-        const room3BorderX = this.map.widthInPixels + this.map2.widthInPixels;
-        const room3BorderY = this.map2.heightInPixels / 2;
-        const room3Border = this.add.rectangle(
-          room3BorderX,
-          room3BorderY,
-          20,
-          this.map2.heightInPixels,
-          0xff0000,
-          0
-        );
-        this.physics.add.existing(room3Border, true);
-
-        this.roomBorders = {
-          room2Border,
-          room3Border,
-        };
-
-        this.add
-          .text(
-            room2BorderX - 50,
-            room2BorderY - 100,
-            "🔒 PHÒNG 2\nLàm quiz để mở",
-            {
-              fontSize: "14px",
-              color: "#fbbf24",
-              fontStyle: "bold",
-              align: "center",
-            }
-          )
-          .setOrigin(0.5)
-          .setDepth(10);
-
-        this.add
-          .text(
-            room3BorderX - 50,
-            room3BorderY - 100,
-            "🔒 PHÒNG 3\nLàm quiz để mở",
-            {
-              fontSize: "14px",
-              color: "#fbbf24",
-              fontStyle: "bold",
-              align: "center",
-            }
-          )
-          .setOrigin(0.5)
-          .setDepth(10);
-      }
-
-      createPictures() {
-        const roomWidth = this.map.widthInPixels;
-        const sectionWidth = roomWidth / 6;
-
-        const picturePositions = [
-          {
-            x: sectionWidth * 0.5,
-            y: 100,
-            id: 1,
-            imagePath: "/pic/r1-e3.jpg",
-            caption:
-              "Đài phát thanh Mễ Trì của Đài Tiếng nói Việt Nam (VOV) bị tấn công vào đêm 18 tháng 12. Mặc dù thiệt hại về tài sản nặng nề, VOV vẫn tiếp tục phát sóng sau 9 phút im lặng.",
-          },
-          {
-            x: sectionWidth * 1.5,
-            y: 100,
-            id: 2,
-            imagePath: "/pic/r1-e4.jpg",
-            caption:
-              "Các hầm trú bom ven đường cá nhân được dựng lên dọc theo các con phố.",
-          },
-          {
-            x: sectionWidth * 2.5,
-            y: 100,
-            id: 3,
-            imagePath: "/pic/r2-e3.jpg",
-            caption:
-              "Đơn vị không quân Sao Đỏ đã góp phần vào chiến thắng của trận chiến.",
-          },
-          {
-            x: sectionWidth * 3.5,
-            y: 100,
-            id: 4,
-            imagePath: "/pic/r1-e5.jpg",
-            caption: "Một phi công Mỹ bị bắt trên hồ Trúc Bạch ở Hà Nội.",
-          },
-          {
-            x: sectionWidth * 4.5,
-            y: 100,
-            id: 5,
-            imagePath: "/pic/r1-e6.jpg",
-            caption:
-              "Bữa ăn hàng ngày của các phi công bị bắt tại Nhà tù Hỏa Lò ở Hà Nội.",
-          },
-          {
-            x: sectionWidth * 5.5,
-            y: 100,
-            id: 6,
-            imagePath: "/pic/r1-e7.jpg",
-            caption:
-              "Thất bại của các cuộc không kích đã buộc Mỹ và tay sai phải ngồi vào bàn đàm phán năm 1973 và ký Hiệp định Paris, chấm dứt chiến tranh ở Việt Nam. Trong ảnh, bà Nguyễn Thị Bình, Bộ trưởng Ngoại giao Chính phủ Cách mạng Lâm thời Cộng hòa miền Nam Việt Nam, đã ký hiệp định vào ngày 27 tháng 1 năm 1973.",
-          },
-        ];
-
-        picturePositions.forEach((pos) => {
-          const collision = this.add.rectangle(
-            pos.x,
-            pos.y,
-            100,
-            60,
-            0xff0000,
-            0
-          );
-          this.physics.add.existing(collision, true);
-
-          this.pictures.push({
-            collision: collision,
-            id: pos.id,
-            imagePath: pos.imagePath,
-            caption: pos.caption,
-          });
-        });
-      }
-
-      createInfoPoints() {
-        const room1Exhibits = museumData
-          .filter((exhibit) => exhibit.roomNumber === 1)
-          .slice(0, 2);
-        const room2Exhibits = museumData
-          .filter((exhibit) => exhibit.roomNumber === 2)
-          .slice(0, 2);
-        const room3Exhibits = museumData
-          .filter((exhibit) => exhibit.roomNumber === 3)
-          .slice(0, 2);
-
-        const room1Positions = [
-          { x: 300, y: 300 },
-          { x: 300, y: 600 },
-        ];
-        room1Exhibits.forEach((exhibit, index) => {
-          const pos = room1Positions[index];
-          this.createInfoPoint(pos.x, pos.y, exhibit);
-        });
-
-        const room2Positions = [
-          { x: this.map.widthInPixels + 300, y: 300 },
-          { x: this.map.widthInPixels + 300, y: 600 },
-        ];
-
-        room2Exhibits.forEach((exhibit, index) => {
-          const pos = room2Positions[index];
-          this.createInfoPoint(pos.x, pos.y, exhibit);
-        });
-
-        const room3Positions = [
-          { x: this.map.widthInPixels + this.map2.widthInPixels + 300, y: 300 },
-          { x: this.map.widthInPixels + this.map2.widthInPixels + 300, y: 600 },
-        ];
-
-        room3Exhibits.forEach((exhibit, index) => {
-          const pos = room3Positions[index];
-          this.createInfoPoint(pos.x, pos.y, exhibit);
-        });
-      }
-
-      createComprehensiveQuizPoint() {
-        const map3OffsetX = this.map.widthInPixels + this.map2.widthInPixels;
-        const x = map3OffsetX + this.map3.widthInPixels / 2;
-        const y = this.map3.heightInPixels / 2;
-
-        const sprite = this.add.sprite(x, y, "quiz-point");
-        sprite.setDepth(10);
-        sprite.setScale(0.9);
-        this.tweens.add({
-          targets: sprite,
-          scale: 1.05,
-          duration: 1200,
-          yoyo: true,
-          repeat: -1,
-          ease: "Sine.easeInOut",
-        });
-
-        const collision = this.add.rectangle(x, y, 120, 120, 0xff0000, 0);
-        this.physics.add.existing(collision, true);
-
-        this.add
-          .text(x, y + 80, "Quiz tổng hợp (Phòng 1–3)", {
-            fontSize: "14px",
-            color: "#e8e8e8",
-            backgroundColor: "#000000",
-            padding: { x: 8, y: 4 },
-            align: "center",
-            wordWrap: { width: 260 },
-          })
-          .setOrigin(0.5)
-          .setDepth(10);
-
-        this.quizPoint = { collision, sprite };
-      }
-
-      createInfoPoint(x: number, y: number, exhibit: ExhibitData) {
-        const sprite = this.add.sprite(x, y, "info-point");
-        sprite.setDepth(5);
-        sprite.setScale(0.8);
-        sprite.setInteractive();
-
-        this.tweens.add({
-          targets: sprite,
-          scale: 1,
-          duration: 1000,
-          yoyo: true,
-          repeat: -1,
-          ease: "Sine.easeInOut",
-        });
-
-        this.add
-          .text(x, y + 60, exhibit.title, {
-            fontSize: "12px",
-            color: "#e8e8e8",
-            backgroundColor: "#000000",
-            padding: { x: 8, y: 4 },
-            align: "center",
-            wordWrap: { width: 200 },
-          })
-          .setOrigin(0.5)
-          .setDepth(5);
-
-        sprite.on("pointerdown", () => {
-          (window as any).handleExhibitInteract(exhibit);
-        });
-
-        this.infoPoints.push({
-          sprite: sprite,
-          exhibit: exhibit,
-        });
-      }
-
-      updateCameraBounds(roomNumber: number) {
-        switch (roomNumber) {
-          case 1:
-            this.cameras.main.setBounds(50, 150, 1340, 500);
-            break;
-          case 2:
-            this.cameras.main.setBounds(1490, 150, 1340, 500);
-            break;
-          case 3:
-            this.cameras.main.setBounds(2930, 150, 1340, 500);
-            break;
-          default:
-            this.cameras.main.setBounds(0, 150, 9000, 500);
-        }
-      }
-
       showPictureModal(imagePath: string, caption: string) {
         this.scene.pause();
 
         (window as any).showPictureModal?.(imagePath, caption);
       }
 
-      createBackToRoom1Button(x: number, y: number, fromRoom: number) {
-        const buttonBg = this.add.rectangle(x, y, 200, 50, 0x3366cc, 0.8);
-        buttonBg.setStrokeStyle(2, 0x4488ff);
-        buttonBg.setDepth(10);
-        buttonBg.setInteractive({ cursor: "pointer" });
-
-        const buttonText = this.add.text(x, y, "VỀ PHÒNG 1", {
-          fontSize: "16px",
-          color: "#ffffff",
-          fontStyle: "bold",
-        });
-        buttonText.setOrigin(0.5);
-        buttonText.setDepth(11);
-
-        // Store button references for later removal if needed
-        if (!this.backButtons) {
-          this.backButtons = [];
-        }
-        this.backButtons.push({
-          bg: buttonBg,
-          text: buttonText,
-          room: fromRoom,
-        });
-
-        // Add hover effects
-        buttonBg.on("pointerover", () => {
-          buttonBg.setFillStyle(0x4488ff, 0.9);
-          this.tweens.add({
-            targets: [buttonBg, buttonText],
-            scaleX: 1.05,
-            scaleY: 1.05,
-            duration: 100,
-            ease: "Power2",
-          });
-        });
-
-        buttonBg.on("pointerout", () => {
-          buttonBg.setFillStyle(0x3366cc, 0.8);
-          this.tweens.add({
-            targets: [buttonBg, buttonText],
-            scaleX: 1,
-            scaleY: 1,
-            duration: 100,
-            ease: "Power2",
-          });
-        });
-
-        // Add click event
-        buttonBg.on("pointerdown", () => {
-          this.teleportToRoom1(fromRoom);
-        });
-      }
-
-      createGoToRoomButton(x: number, y: number, toRoom: number) {
-        // Create button background
-        const buttonBg = this.add.rectangle(
-          x,
-          y,
-          200,
-          50,
-          toRoom === 2 ? 0x22c55e : 0x3b82f6,
-          0.8
-        );
-        buttonBg.setStrokeStyle(2, toRoom === 2 ? 0x16a34a : 0x2563eb);
-        buttonBg.setDepth(10);
-        buttonBg.setInteractive({ cursor: "pointer" });
-
-        // Create button text
-        const buttonText = this.add.text(x, y, `ĐI TỚI PHÒNG ${toRoom}`, {
-          fontSize: "16px",
-          color: "#ffffff",
-          fontStyle: "bold",
-        });
-        buttonText.setOrigin(0.5);
-        buttonText.setDepth(11);
-
-        // Add to tracking array
-        if (!this.goToRoomButtons) {
-          this.goToRoomButtons = [];
-        }
-        this.goToRoomButtons.push({
-          bg: buttonBg,
-          text: buttonText,
-          room: toRoom,
-        });
-
-        // Add hover effects
-        buttonBg.on("pointerover", () => {
-          buttonBg.setFillStyle(toRoom === 2 ? 0x16a34a : 0x2563eb, 0.9);
-          this.tweens.add({
-            targets: [buttonBg, buttonText],
-            scaleX: 1.05,
-            scaleY: 1.05,
-            duration: 100,
-            ease: "Power2",
-          });
-        });
-
-        buttonBg.on("pointerout", () => {
-          buttonBg.setFillStyle(toRoom === 2 ? 0x22c55e : 0x3b82f6, 0.8);
-          this.tweens.add({
-            targets: [buttonBg, buttonText],
-            scaleX: 1,
-            scaleY: 1,
-            duration: 100,
-            ease: "Power2",
-          });
-        });
-
-        // Add click event
-        buttonBg.on("pointerdown", () => {
-          this.teleportToRoom(toRoom);
-        });
-      }
-
-      teleportToRoom(roomNumber: number) {
-        const player = this.playerMovement.getPlayer();
-        // Create teleport effect
-        const teleportEffect = this.add.circle(
-          player.x,
-          player.y,
-          0,
-          roomNumber === 2 ? 0x22c55e : 0x3b82f6,
-          0.6
-        );
-        teleportEffect.setDepth(15);
-
-        this.tweens.add({
-          targets: teleportEffect,
-          radius: 100,
-          alpha: 0,
-          duration: 500,
-          ease: "Power2",
-          onComplete: () => {
-            teleportEffect.destroy();
-          },
-        });
-
-        // Calculate target position
-        let targetX: number;
-        if (roomNumber === 2) {
-          targetX = this.map.widthInPixels + 100; // Room 2 position
-        } else if (roomNumber === 3) {
-          targetX = this.map.widthInPixels + this.map2.widthInPixels + 100; // Room 3 position
-        } else {
-          targetX = 720; // Default to room 1 center
-        }
-
-        // Teleport player
-        this.playerMovement.teleportTo(targetX, 480);
-
-        // Update position reference
-        (window as any).playerPositionRef.current = { x: targetX, y: 480 };
-
-        // Show success message
-        const roomNames = {
-          2: "PHÒNG 2: BẢN CHẤT & HÌNH THỨC",
-          3: "PHÒNG 3: NGHIÊN CỨU KHOA HỌC",
-        };
-
-        const successMessage = this.add.text(
-          targetX,
-          400,
-          `✅ Chào mừng đến ${
-            roomNames[roomNumber as keyof typeof roomNames]
-          }!`,
-          {
-            fontSize: "18px",
-            color: roomNumber === 2 ? "#22c55e" : "#3b82f6",
-            fontStyle: "bold",
-            backgroundColor: "#000000",
-            padding: { x: 10, y: 5 },
-          }
-        );
-        successMessage.setOrigin(0.5);
-        successMessage.setDepth(20);
-
-        // Auto remove success message
-        this.time.delayedCall(3000, () => {
-          if (successMessage && successMessage.scene) {
-            successMessage.destroy();
-          }
-        });
-      }
-
       refreshBackButtons() {
-        // Clear existing back buttons
-        if (this.backButtons) {
-          this.backButtons.forEach((button) => {
-            button.bg.destroy();
-            button.text.destroy();
-          });
-          this.backButtons = [];
-        }
-
-        // Clear existing go-to-room buttons
-        if (this.goToRoomButtons) {
-          this.goToRoomButtons.forEach((button) => {
-            button.bg.destroy();
-            button.text.destroy();
-          });
-          this.goToRoomButtons = [];
-        }
-
-        // Recreate back buttons for unlocked rooms (in rooms 2 and 3)
-        const currentUnlockedRooms = (window as any).unlockedRooms;
-        if (currentUnlockedRooms && currentUnlockedRooms.has(2)) {
-          this.createBackToRoom1Button(this.map.widthInPixels + 100, 200, 2);
-        }
-        if (currentUnlockedRooms && currentUnlockedRooms.has(3)) {
-          this.createBackToRoom1Button(
-            this.map.widthInPixels + this.map2.widthInPixels + 100,
-            200,
-            3
-          );
-        }
-
-        // Create go-to-room buttons in room 1 for unlocked rooms
-        let buttonY = 300; // Starting Y position for buttons in room 1
-        if (currentUnlockedRooms && currentUnlockedRooms.has(2)) {
-          this.createGoToRoomButton(720, buttonY, 2); // Center of room 1, go to room 2
-          buttonY += 70; // Move next button down
-        }
-        if (currentUnlockedRooms && currentUnlockedRooms.has(3)) {
-          this.createGoToRoomButton(720, buttonY, 3); // Center of room 1, go to room 3
-        }
-      }
-
-      teleportToRoom1(fromRoom: number) {
-        const player = this.playerMovement.getPlayer();
-        // Create teleport effect
-        const teleportEffect = this.add.circle(
-          player.x,
-          player.y,
-          0,
-          0x00aaff,
-          0.6
-        );
-        teleportEffect.setDepth(15);
-
-        this.tweens.add({
-          targets: teleportEffect,
-          radius: 100,
-          alpha: 0,
-          duration: 500,
-          ease: "Power2",
-          onComplete: () => {
-            teleportEffect.destroy();
-          },
-        });
-
-        // Teleport player to room 1 center
-        this.playerMovement.teleportTo(720, 480);
-
-        // Update position reference
-        (window as any).playerPositionRef.current = { x: 720, y: 480 };
-
-        // Refresh buttons to show available rooms
-        this.refreshBackButtons();
-
-        // Show success message
-        const successMessage = this.add.text(720, 400, `Đã quay về Phòng 1!`, {
-          fontSize: "20px",
-          color: "#00ff88",
-          fontStyle: "bold",
-          backgroundColor: "#000000",
-          padding: { x: 10, y: 5 },
-        });
-        successMessage.setOrigin(0.5);
-        successMessage.setDepth(20);
-
-        this.time.delayedCall(3000, () => {
-          if (successMessage && successMessage.scene) {
-            successMessage.destroy();
-          }
-        });
+        this.roomNavigationManager.refreshBackButtons();
+        this.backButtons = this.roomNavigationManager.getBackButtons();
+        this.goToRoomButtons = this.roomNavigationManager.getGoToRoomButtons();
       }
 
       unlockRoom(roomNumber: number) {
+        // Check if room is already unlocked to prevent duplicate teleporting
+        if (this.roomsUnlockedByQuiz.has(roomNumber)) {
+          console.log(`Room ${roomNumber} already unlocked, skipping teleport`);
+          return;
+        }
+
+        this.roomsUnlockedByQuiz.add(roomNumber);
+
         const teleportPositions = {
           2: { x: this.map.widthInPixels + 100, y: 480 }, // Room 2 entrance
           3: {
@@ -1105,30 +629,6 @@ export default function MuseumScene({
             x: targetPos.x,
             y: targetPos.y,
           };
-
-          const successText = this.add
-            .text(
-              targetPos.x,
-              targetPos.y - 100,
-              "✅ CHÀO MỪNG ĐÊN PHÒNG 2!\n🎉 Quiz hoàn thành!",
-              {
-                fontSize: "16px",
-                color: "#22c55e",
-                fontStyle: "bold",
-                align: "center",
-                backgroundColor: "#000000",
-                padding: { x: 10, y: 10 },
-              }
-            )
-            .setOrigin(0.5)
-            .setDepth(150);
-
-          // Remove success message after 3 seconds
-          this.time.delayedCall(3000, () => {
-            if (successText) {
-              successText.destroy();
-            }
-          });
         } else if (roomNumber === 3) {
           const targetPos = teleportPositions[3];
           const player = this.playerMovement.getPlayer();
@@ -1163,30 +663,10 @@ export default function MuseumScene({
             y: targetPos.y,
           };
 
-          // Show success message
-          const successText = this.add
-            .text(
-              targetPos.x,
-              targetPos.y - 100,
-              "✅ CHÀO MỪNG ĐÊN PHÒNG 3!\n🔬 Khám phá khoa học!",
-              {
-                fontSize: "16px",
-                color: "#22c55e",
-                fontStyle: "bold",
-                align: "center",
-                backgroundColor: "#000000",
-                padding: { x: 10, y: 10 },
-              }
-            )
-            .setOrigin(0.5)
-            .setDepth(150);
-
-          // Remove success message after 3 seconds
-          this.time.delayedCall(3000, () => {
-            if (successText) {
-              successText.destroy();
-            }
-          });
+          // Send position to server
+          if ((window as any).gameClient && (window as any).currentPlayer) {
+            (window as any).gameClient.movePlayer(targetPos.x, targetPos.y);
+          }
         }
 
         // Refresh back buttons after unlocking a room
@@ -1213,6 +693,10 @@ export default function MuseumScene({
 
         if (player && this.cameras.main) {
           this.cameras.main.centerOn(player.x, player.y);
+        }
+
+        if (this.time.now % 5000 < 16) {
+          this.otherPlayersManager.cleanupCorruptedSprites();
         }
 
         this.nearLockedDoor = null;
@@ -1243,7 +727,7 @@ export default function MuseumScene({
         }
 
         this.nearQuizPoint = false;
-        if (this.quizPoint) {
+        if (this.quizPoint && !this.quizCompleted) {
           const distance = Phaser.Math.Distance.Between(
             player.x,
             player.y,
@@ -1252,6 +736,19 @@ export default function MuseumScene({
           );
           if (distance < 90) {
             this.nearQuizPoint = true;
+          }
+        }
+
+        this.nearFinishLine = false;
+        if (this.finishLine) {
+          const distance = Phaser.Math.Distance.Between(
+            player.x,
+            player.y,
+            this.finishLine.collision.x,
+            this.finishLine.collision.y
+          );
+          if (distance < 100) {
+            this.nearFinishLine = true;
           }
         }
 
@@ -1289,7 +786,7 @@ export default function MuseumScene({
           }
         }
 
-        if (this.nearQuizPoint) {
+        if (this.nearQuizPoint && !this.quizCompleted) {
           this.promptText.setText("Nhấn E để làm quiz tổng hợp");
           this.promptText.setVisible(true);
           this.promptText.setPosition(
@@ -1319,6 +816,13 @@ export default function MuseumScene({
             (this.sys.game.config.width as number) / 2,
             (this.sys.game.config.height as number) - 60
           );
+        } else if (this.nearFinishLine) {
+          this.promptText.setText("Nhấn F để hoàn thành trò chơi!");
+          this.promptText.setVisible(true);
+          this.promptText.setPosition(
+            (this.sys.game.config.width as number) / 2,
+            (this.sys.game.config.height as number) - 60
+          );
         } else {
           this.promptText.setVisible(false);
         }
@@ -1335,24 +839,89 @@ export default function MuseumScene({
         );
       }
 
-      createWall(
-        x: number,
-        y: number,
-        width: number,
-        height: number,
-        color: number
-      ) {
-        const wall = this.add.rectangle(x, y, width, height, color);
-        this.physics.add.existing(wall, true);
-        // this.walls.push(wall); // Managed by mapDisplay now
-        return wall;
-      }
-
       createChat() {
         this.chatBox = new ChatBox(this, username, (enabled: boolean) => {
           this.playerMovement.setMovementEnabled(enabled);
         });
         this.chatBox.create();
+        (window as any).chatBoxInstance = this.chatBox;
+      }
+
+      updateOtherPlayers(players: Map<string, Player>) {
+        this.otherPlayersManager.updateOtherPlayers(players);
+      }
+
+      removePlayer(playerId: string) {
+        this.otherPlayersManager.removePlayer(playerId);
+      }
+
+      showCompletionMessage(rank: number, time: string) {
+        if (this.completionMessage) {
+          this.completionMessage.destroy();
+        }
+
+        const medals = ["🥇", "🥈", "🥉"];
+        const medal = rank <= 3 ? medals[rank - 1] : `#${rank}`;
+
+        this.completionMessage = this.add
+          .text(
+            (this.sys.game.config.width as number) / 2,
+            100,
+            `${medal} Hoàn thành!\nThứ hạng: ${rank}\nThời gian: ${time}`,
+            {
+              fontSize: "24px",
+              color: "#00ff00",
+              fontStyle: "bold",
+              align: "center",
+              backgroundColor: "#000000",
+              padding: { x: 15, y: 10 },
+            }
+          )
+          .setOrigin(0.5)
+          .setScrollFactor(0)
+          .setDepth(200);
+
+        this.time.delayedCall(5000, () => {
+          if (this.completionMessage) {
+            this.completionMessage.destroy();
+            this.completionMessage = null;
+          }
+        });
+      }
+
+      updateLeaderboard(leaderboard: any[]) {
+        if (this.leaderboardDisplay) {
+          this.leaderboardDisplay.destroy();
+        }
+
+        const top5 = leaderboard.slice(0, 5);
+        let displayText = "🏆 TOP 5 LEADERBOARD 🏆\n\n";
+
+        top5.forEach((entry, index) => {
+          const medals = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"];
+          displayText += `${medals[index]} ${entry.username}: ${entry.completionTime}\n`;
+        });
+
+        this.leaderboardDisplay = this.add
+          .text((this.sys.game.config.width as number) - 20, 20, displayText, {
+            fontSize: "14px",
+            color: "#ffffff",
+            backgroundColor: "#000000aa",
+            padding: { x: 10, y: 8 },
+            align: "left",
+          })
+          .setOrigin(1, 0)
+          .setScrollFactor(0)
+          .setDepth(150);
+      }
+
+      showGamePopup(
+        title: string,
+        message: string,
+        buttonText: string = "OK",
+        onClose?: () => void
+      ) {
+        this.popupManager.showGamePopup(title, message, buttonText, onClose);
       }
     }
 
@@ -1383,6 +952,8 @@ export default function MuseumScene({
       setPictureModalOpen(true);
     };
     (window as any).playerPositionRef = playerPositionRef;
+    (window as any).gameClient = gameClient;
+    (window as any).currentPlayer = currentPlayer;
     (window as any).unlockedRooms = unlockedRooms;
     (window as any).unlockRoom = (roomNumber: number) => {
       const scene = game.scene.getScene("MainScene") as MainScene;
@@ -1391,9 +962,44 @@ export default function MuseumScene({
       }
     };
 
+    (window as any).createFinishLine = () => {
+      const scene = game.scene.getScene("MainScene") as any;
+      if (scene && scene.interactiveElementsManager) {
+        scene.interactiveElementsManager.createFinishLine(scene.mapManager);
+        scene.finishLine = scene.interactiveElementsManager.finishLine;
+      }
+    };
+
+    (window as any).showGamePopup = (
+      title: string,
+      message: string,
+      buttonText?: string,
+      onClose?: () => void
+    ) => {
+      const scene = game.scene.getScene("MainScene") as any;
+      if (scene && scene.showGamePopup) {
+        scene.showGamePopup(title, message, buttonText || "OK", onClose);
+      } else {
+        console.warn("Scene not ready for popup:", title);
+        setTimeout(() => {
+          const retryScene = game.scene.getScene("MainScene") as any;
+          if (retryScene && retryScene.showGamePopup) {
+            retryScene.showGamePopup(
+              title,
+              message,
+              buttonText || "OK",
+              onClose
+            );
+          }
+        }, 100);
+      }
+    };
+
     return () => {
       game.destroy(true);
       phaserGameRef.current = null;
+      (window as any).setOtherPlayersFromScene = null;
+      (window as any).pendingExistingPlayers = null;
     };
   }, [
     onExhibitInteract,
@@ -1402,6 +1008,15 @@ export default function MuseumScene({
     unlockedRooms,
     username,
   ]);
+
+  useEffect(() => {
+    if (phaserGameRef.current && otherPlayers.size > 0) {
+      const scene = phaserGameRef.current.scene.getScene("MainScene") as any;
+      if (scene && scene.updateOtherPlayers) {
+        scene.updateOtherPlayers(otherPlayers);
+      }
+    }
+  }, [otherPlayers]);
 
   const handlePictureModalClose = () => {
     setPictureModalOpen(false);
@@ -1422,6 +1037,12 @@ export default function MuseumScene({
         imagePath={currentPicture}
         caption={currentCaption}
       />
+      {currentPlayer?.username === "admin1234509876" && (
+        <LeaderboardModal
+          isOpen={showLeaderboard}
+          onClose={() => setShowLeaderboard(false)}
+        />
+      )}
     </>
   );
 }

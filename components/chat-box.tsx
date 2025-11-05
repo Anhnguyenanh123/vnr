@@ -23,11 +23,13 @@ export class ChatBox {
   private isTyping: boolean = false;
   private username: string;
   private onMovementToggle: (enabled: boolean) => void;
+  private gameClient: any;
 
   constructor(scene: Phaser.Scene, username: string, onMovementToggle: (enabled: boolean) => void) {
     this.scene = scene;
     this.username = username;
     this.onMovementToggle = onMovementToggle;
+    this.gameClient = (window as any).gameClient;
   }
 
   create() {
@@ -250,11 +252,17 @@ export class ChatBox {
 
   private sendMessage() {
     if (this.isTyping && this.currentMessage.trim()) {
-      const timestamp = new Date().toLocaleTimeString('vi-VN', { 
-        hour: '2-digit', 
-        minute: '2-digit' 
-      });
-      this.addChatMessage(`[${timestamp}] ${this.username}: ${this.currentMessage.trim()}`);
+      // Send to server if connected
+      if (this.gameClient && (window as any).currentPlayer) {
+        this.gameClient.sendMessage(this.currentMessage.trim());
+      } else {
+        // Fallback to local display
+        const timestamp = new Date().toLocaleTimeString('vi-VN', { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        });
+        this.addChatMessage(`[${timestamp}] ${this.username}: ${this.currentMessage.trim()}`);
+      }
     }
     this.cancelInput();
   }
@@ -338,8 +346,16 @@ export class ChatBox {
     });
   }
 
-  public isCurrentlyTyping(): boolean {
+  public getIsTyping(): boolean {
     return this.isTyping;
+  }
+
+  public addServerMessage(message: any) {
+    const timestamp = new Date(message.timestamp).toLocaleTimeString('vi-VN', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+    this.addChatMessage(`[${timestamp}] ${message.username}: ${message.message}`);
   }
 
   public destroy() {

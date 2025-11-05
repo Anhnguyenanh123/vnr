@@ -33,6 +33,7 @@ export default function MuseumPage() {
   const [showStartScreen, setShowStartScreen] = useState(true);
 
   const isLoadingPlayer = useRef(false);
+  const roomUnlockInProgress = useRef<Set<number>>(new Set());
 
   useEffect(() => {
     const playersData = localStorage.getItem("museum-players");
@@ -107,9 +108,13 @@ export default function MuseumPage() {
   const handleExhibitView = useCallback(
     (exhibit: ExhibitData) => {
       if (!unlockedRooms.has(exhibit.roomNumber)) {
-        alert(
-          `Phòng ${exhibit.roomNumber} đang bị khóa. Vui lòng hoàn thành quiz của phòng trước đó.`
-        );
+        if ((window as any).showGamePopup) {
+          (window as any).showGamePopup(
+            "🔒 PHÒNG BỊ KHÓA",
+            `Phòng ${exhibit.roomNumber} đang bị khóa.\nVui lòng hoàn thành quiz của phòng trước đó.`,
+            "OK"
+          );
+        }
         return;
       }
       setSelectedExhibit(exhibit);
@@ -127,28 +132,62 @@ export default function MuseumPage() {
   }, []);
 
   const handleQuizPass = useCallback(() => {
+    console.log("Quiz passed for room:", currentQuizRoom);
     if (currentQuizRoom !== null) {
       const roomToUnlock = currentQuizRoom + 1;
+
+      // Check if room unlock is already in progress
+      if (roomUnlockInProgress.current.has(roomToUnlock)) {
+        console.log(`Room ${roomToUnlock} unlock already in progress, skipping`);
+        return;
+      }
+
+      roomUnlockInProgress.current.add(roomToUnlock);
 
       setUnlockedRooms((prev) => {
         const newUnlocked = new Set([...prev, roomToUnlock]);
         return newUnlocked;
       });
 
-      if (window.unlockRoom) {
-        window.unlockRoom(roomToUnlock);
-      }
-
       setShowQuiz(false);
       setCurrentQuizRoom(null);
 
-      alert(`Chúc mừng! Bạn đã mở khóa Phòng ${roomToUnlock}`);
+      setTimeout(() => {
+        if ((window as any).showGamePopup) {
+          (window as any).showGamePopup(
+            "Chúc mừng!",
+            `Bạn đã mở khóa Phòng ${roomToUnlock}! Hãy khám phá nội dung mới.`,
+            "KHÁM PHÁ",
+            () => {
+              setTimeout(() => {
+                if (window.unlockRoom) {
+                  window.unlockRoom(roomToUnlock);
+                }
+                // Clear the flag after unlocking
+                roomUnlockInProgress.current.delete(roomToUnlock);
+              }, 300);
+            }
+          );
+        } else {
+          if (window.unlockRoom) {
+            window.unlockRoom(roomToUnlock);
+          }
+          // Clear the flag after unlocking
+          roomUnlockInProgress.current.delete(roomToUnlock);
+        }
+      }, 500);
     }
   }, [currentQuizRoom]);
 
   const handleComprehensiveQuizPass = useCallback(() => {
     setShowComprehensiveQuiz(false);
     setShowCongrats(true);
+    
+    setTimeout(() => {
+      if ((window as any).createFinishLine) {
+        (window as any).createFinishLine();
+      }
+    }, 1000);
   }, []);
 
   const handleComprehensiveQuizClose = useCallback(() => {
@@ -158,6 +197,12 @@ export default function MuseumPage() {
   const handleQuizClose = useCallback(() => {
     setShowQuiz(false);
     setCurrentQuizRoom(null);
+  }, []);
+
+  const handleLogout = useCallback(() => {
+    setCurrentPlayer(null);
+    setShowStartScreen(true);
+    setShowInstructions(false);
   }, []);
 
   const handleDoorInteract = useCallback((roomNumber: number) => {

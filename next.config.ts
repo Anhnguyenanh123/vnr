@@ -4,6 +4,8 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  output: "standalone",
+  serverExternalPackages: [],
   /* other config options here */
 };
 
