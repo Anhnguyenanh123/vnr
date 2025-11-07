@@ -9,7 +9,7 @@ import CongratsModal from "@/components/congrats-modal";
 import Minimap from "@/components/minimap";
 import StartScreen from "@/components/start-screen";
 import type { ExhibitData, Player } from "@/types/museum";
-import { roomQuizzes } from "@/data/museum-data";
+import { roomQuizzes } from "@/data/museum-quizes";
 
 export default function MuseumPage() {
   const [selectedExhibit, setSelectedExhibit] = useState<ExhibitData | null>(
@@ -138,7 +138,9 @@ export default function MuseumPage() {
 
       // Check if room unlock is already in progress
       if (roomUnlockInProgress.current.has(roomToUnlock)) {
-        console.log(`Room ${roomToUnlock} unlock already in progress, skipping`);
+        console.log(
+          `Room ${roomToUnlock} unlock already in progress, skipping`
+        );
         return;
       }
 
@@ -182,7 +184,7 @@ export default function MuseumPage() {
   const handleComprehensiveQuizPass = useCallback(() => {
     setShowComprehensiveQuiz(false);
     setShowCongrats(true);
-    
+
     setTimeout(() => {
       if ((window as any).createFinishLine) {
         (window as any).createFinishLine();
