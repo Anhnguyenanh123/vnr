@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ExhibitData } from "@/types/museum";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
-import HTMLFlipBook from "react-pageflip";
+import dynamic from "next/dynamic";
+const HTMLFlipBook = dynamic(() => import("react-pageflip"), { ssr: false });
 
 interface InfoModalProps {
   exhibit: ExhibitData | null;
@@ -20,6 +21,7 @@ export default function InfoModal({
   onClose,
 }: InfoModalProps) {
   const flipBookRef = useRef<any>(null);
+  const [bookReady, setBookReady] = useState(false);
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "unset";
@@ -35,6 +37,10 @@ export default function InfoModal({
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
   }, [isOpen, onClose]);
+
+  useEffect(() => {
+    if (isOpen) setBookReady(false);
+  }, [isOpen]);
 
   const pages = useMemo(() => {
     const content = exhibit?.content ?? "";
@@ -57,7 +63,7 @@ export default function InfoModal({
         onClick={onClose}
       />
       {/* Modal Container */}
-      <div className="relative bg-[#16213e] border border-[#0f3460] rounded-lg max-w-5xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
+      <div className="relative bg-[#16213e] border border-[#0f3460] rounded-lg max-w-5xl w-full max-h-[95vh] overflow-hidden shadow-2xl">
         {/* Header */}
         <div className="sticky top-0 bg-linear-to-r from-[#0f3460] to-[#16213e] px-6 py-4 flex items-center justify-between border-b border-[#1a1a2e] z-10">
           <div className="flex-1">
@@ -71,7 +77,7 @@ export default function InfoModal({
         </div>
 
         {/* Page Flip Book */}
-        <div className="flex justify-center items-center p-4 bg-[#0f172a] h-[calc(90vh-120px)] overflow-hidden">
+        <div className="flex justify-center items-center p-4 bg-[#0f172a] h-[calc(95vh-120px)] overflow-hidden">
           <HTMLFlipBook
             width={600}
             height={700}
@@ -84,7 +90,10 @@ export default function InfoModal({
             showCover={true}
             className="shadow-2xl rounded-lg overflow-hidden"
             ref={flipBookRef}
-            style={{}}
+            style={{
+              opacity: bookReady ? 1 : 0,
+              transition: "opacity 200ms ease-in",
+            }}
             startPage={0}
             drawShadow={true}
             flippingTime={800}
@@ -99,7 +108,9 @@ export default function InfoModal({
             autoSize={true}
             onFlip={() => {}}
             onChangeOrientation={() => {}}
-            onInit={() => {}}
+            onInit={() => {
+              setBookReady(true);
+            }}
             onUpdate={() => {}}
           >
             {/* Cover Page */}
@@ -112,9 +123,32 @@ export default function InfoModal({
                     src={exhibit.image}
                     alt={exhibit.title}
                     className="w-full h-auto object-cover"
+                    priority
                   />
                 </div>
               )}
+
+              {exhibit.examples && exhibit.examples.length > 0 && (
+                <div className="mb-4 w-full max-w-[520px]">
+                  <div className="flex gap-3 overflow-x-auto no-scrollbar py-1">
+                    {exhibit.examples.map((img, idx) => (
+                      <div
+                        key={idx}
+                        className="shrink-0 rounded-lg overflow-hidden border-2 border-[#4ade80]/30 hover:border-[#4ade80] transition"
+                      >
+                        <Image
+                          width={160}
+                          height={100}
+                          src={img}
+                          alt={`Ví dụ ${idx + 1}`}
+                          className="w-[160px] h-[100px] object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <h1 className="text-3xl font-bold text-[#4ade80] mb-3">
                 {exhibit.title}
               </h1>
