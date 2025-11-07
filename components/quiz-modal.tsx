@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { X, CheckCircle, XCircle } from "lucide-react";
+import { X, CheckCircle, XCircle, RotateCcw } from "lucide-react";
 import type { QuizQuestion } from "@/types/museum";
 
 interface QuizModalProps {
@@ -10,6 +10,13 @@ interface QuizModalProps {
   questions: QuizQuestion[];
   onPass: () => void;
   onClose: () => void;
+}
+
+interface QuizProgress {
+  currentQuestion: number;
+  score: number[];
+  correctCount: number;
+  shuffledQuestions: ShuffledQuestion[];
 }
 
 interface ShuffledQuestion {
@@ -42,6 +49,7 @@ export default function QuizModal({
   const [isCorrect, setIsCorrect] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
   const [score, setScore] = useState<number[]>([]);
+  const [isExiting, setIsExiting] = useState(false);
 
   // Shuffle questions and answers when modal opens
   const shuffledQuestions = useMemo(() => {
@@ -69,24 +77,63 @@ export default function QuizModal({
     });
   }, [isOpen, questions]);
 
+  const saveQuizProgress = () => {
+    const progress: QuizProgress = {
+      currentQuestion,
+      score,
+      correctCount,
+      shuffledQuestions,
+    };
+    localStorage.setItem(
+      `quiz_progress_room_${roomNumber}`,
+      JSON.stringify(progress)
+    );
+  };
+
+  const loadQuizProgress = (): QuizProgress | null => {
+    const saved = localStorage.getItem(`quiz_progress_room_${roomNumber}`);
+    return saved ? JSON.parse(saved) : null;
+  };
+
+  const clearQuizProgress = () => {
+    localStorage.removeItem(`quiz_progress_room_${roomNumber}`);
+  };
+
+  const resetQuiz = () => {
+    setCurrentQuestion(0);
+    setSelectedAnswer(null);
+    setShowResult(false);
+    setCorrectCount(0);
+    setScore([]);
+    clearQuizProgress();
+  };
+
   useEffect(() => {
     if (isOpen) {
-      setCurrentQuestion(0);
-      setSelectedAnswer(null);
-      setShowResult(false);
-      setCorrectCount(0);
-      setScore([]);
+      const savedProgress = loadQuizProgress();
+      if (savedProgress && savedProgress.shuffledQuestions.length > 0) {
+        setCurrentQuestion(savedProgress.currentQuestion);
+        setScore(savedProgress.score);
+        setCorrectCount(savedProgress.correctCount);
+        setSelectedAnswer(null);
+        setShowResult(false);
+      } else {
+        resetQuiz();
+      }
     }
   }, [isOpen]);
 
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
+      document.addEventListener("keydown", handleEscapeKey);
     } else {
       document.body.style.overflow = "unset";
+      document.removeEventListener("keydown", handleEscapeKey);
     }
     return () => {
       document.body.style.overflow = "unset";
+      document.removeEventListener("keydown", handleEscapeKey);
     };
   }, [isOpen]);
 
@@ -100,12 +147,13 @@ export default function QuizModal({
     setIsCorrect(correct);
     setShowResult(true);
 
-    if (correct) {
-      setCorrectCount((prev) => prev + 1);
-      setScore((prev) => [...prev, 1]);
-    } else {
-      setScore((prev) => [...prev, 0]);
-    }
+    const newScore = [...score, correct ? 1 : 0];
+    const newCorrectCount = correct ? correctCount + 1 : correctCount;
+
+    setScore(newScore);
+    setCorrectCount(newCorrectCount);
+
+    saveQuizProgress();
   };
 
   const handleNext = () => {
@@ -113,17 +161,35 @@ export default function QuizModal({
       setCurrentQuestion((prev) => prev + 1);
       setSelectedAnswer(null);
       setShowResult(false);
+      saveQuizProgress();
     } else {
-      // Quiz completed
       if (correctCount === shuffledQuestions.length) {
+        clearQuizProgress();
         onPass();
       } else {
-        // Show retry message or close
         alert(
           `Bạn đã trả lời đúng ${correctCount}/${shuffledQuestions.length} câu. Vui lòng thử lại!`
         );
+        clearQuizProgress();
         onClose();
       }
+    }
+  };
+
+  const handleClose = () => {
+    if (!isExiting) {
+      setIsExiting(true);
+      saveQuizProgress();
+      setTimeout(() => {
+        setIsExiting(false);
+        onClose();
+      }, 100);
+    }
+  };
+
+  const handleEscapeKey = (event: KeyboardEvent) => {
+    if (event.key === "Escape" && isOpen) {
+      handleClose();
     }
   };
 
@@ -136,19 +202,43 @@ export default function QuizModal({
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
       <div className="bg-[#16213e] border-2 border-[#0f3460] rounded-lg max-w-2xl w-full max-h-[95vh] overflow-y-auto no-scrollbar">
-        <div className="sticky top-0 bg-[#16213e] border-b border-[#0f3460] p-6 flex justify-between items-center">
-          <div className="flex-1">
-            <h2 className="text-2xl font-bold text-[#e8e8e8]">
-              Câu hỏi Phòng {roomNumber}
-            </h2>
-            <p className="text-sm text-[#94a3b8] mt-1">
-              Trả lời đúng tất cả câu hỏi để mở khóa phòng tiếp theo
-            </p>
-            <div className="mt-3 bg-[#1a1a2e] rounded-full h-2 overflow-hidden">
-              <div
-                className="bg-linear-to-r from-[#4ade80] to-[#22c55e] h-full transition-all duration-500 ease-out"
-                style={{ width: `${progress}%` }}
-              />
+        <div className="sticky top-0 bg-[#16213e] border-b border-[#0f3460] p-6">
+          <div className="flex justify-between items-start">
+            <div className="flex-1 mr-4">
+              <h2 className="text-2xl font-bold text-[#e8e8e8]">
+                Câu hỏi Phòng {roomNumber}
+              </h2>
+              <p className="text-sm text-[#94a3b8] mt-1">
+                Trả lời đúng tất cả câu hỏi để mở khóa phòng tiếp theo
+              </p>
+              {(currentQuestion > 0 || score.length > 0) && (
+                <p className="text-xs text-[#4ade80] mt-1">
+                  ✓ Tiến trình sẽ được lưu tự động
+                </p>
+              )}
+              <div className="mt-3 bg-[#1a1a2e] rounded-full h-2 overflow-hidden">
+                <div
+                  className="bg-linear-to-r from-[#4ade80] to-[#22c55e] h-full transition-all duration-500 ease-out"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-2 items-start">
+              <button
+                onClick={resetQuiz}
+                className="p-2 text-[#94a3b8] hover:text-[#4ade80] transition-colors rounded-lg hover:bg-[#0f3460]/50"
+                title="Reset quiz"
+              >
+                <RotateCcw className="w-5 h-5" />
+              </button>
+              <button
+                onClick={handleClose}
+                className="p-2 text-[#94a3b8] hover:text-red-400 transition-colors rounded-lg hover:bg-[#0f3460]/50"
+                title="Đóng (Esc)"
+              >
+                <X className="w-6 h-6" />
+              </button>
             </div>
           </div>
 
