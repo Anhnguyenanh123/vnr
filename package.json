@@ -4,13 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
-    "client:dev": "next dev -p 25577 --turbopack",
+    "client:dev": "next dev -p 25576 --turbopack",
     "server:dev": "cd server && npm run dev",
     "build": "npm run server:build && npm run client:build",
     "client:build": "next build",
     "server:build": "cd server && npm run build",
     "start": "concurrently \"npm run server:start\" \"npm run client:start\"",
-    "client:start": "next start -p ${CLIENT_PORT:-25577}",
+    "client:start": "next start -p ${CLIENT_PORT:-25576}",
     "server:start": "cd server && npm start",
     "lint": "eslint"
   },

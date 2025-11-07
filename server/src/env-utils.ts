@@ -48,13 +48,14 @@ export function getAllowedOrigins(): string[] {
   origins.push("https://mln131-internal.hyudequeue.xyz");
 
   if (process.env.NODE_ENV === "development") {
+    origins.push("http://localhost:25576");
     origins.push("http://localhost:25577");
     origins.push("http://localhost:25578");
   }
 
   if (origins.length === 2) {
     if (process.env.NODE_ENV === "development") {
-      origins.push("http://localhost:25577");
+      origins.push("http://localhost:25576");
     }
   }
 
