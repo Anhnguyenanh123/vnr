@@ -1,10 +1,18 @@
-import { PlayerMovement } from '../player-movement';
+import { PlayerMovement } from "../player-movement";
 
 export class RoomNavigationManager {
   private scene: Phaser.Scene;
   private playerMovement: PlayerMovement;
-  private backButtons: Array<{bg: Phaser.GameObjects.Rectangle, text: Phaser.GameObjects.Text, room: number}> = [];
-  private goToRoomButtons: Array<{bg: Phaser.GameObjects.Rectangle, text: Phaser.GameObjects.Text, room: number}> = [];
+  private backButtons: Array<{
+    bg: Phaser.GameObjects.Rectangle;
+    text: Phaser.GameObjects.Text;
+    room: number;
+  }> = [];
+  private goToRoomButtons: Array<{
+    bg: Phaser.GameObjects.Rectangle;
+    text: Phaser.GameObjects.Text;
+    room: number;
+  }> = [];
 
   constructor(scene: Phaser.Scene, playerMovement: PlayerMovement) {
     this.scene = scene;
@@ -32,11 +40,11 @@ export class RoomNavigationManager {
 
     // Recreate back buttons for unlocked rooms (in rooms 2 and 3)
     const currentUnlockedRooms = (window as any).unlockedRooms;
-    
+
     // Get map dimensions from the scene
     const map = (this.scene as any).map;
     const map2 = (this.scene as any).map2;
-    
+
     if (currentUnlockedRooms && currentUnlockedRooms.has(2)) {
       this.createBackToRoom1Button(map.widthInPixels + 100, 200, 2);
     }
@@ -48,10 +56,10 @@ export class RoomNavigationManager {
       );
     }
 
-    let buttonY = 300; 
+    let buttonY = 300;
     if (currentUnlockedRooms && currentUnlockedRooms.has(2)) {
-      this.createGoToRoomButton(720, buttonY, 2); 
-      buttonY += 70; 
+      this.createGoToRoomButton(720, buttonY, 2);
+      buttonY += 70;
     }
     if (currentUnlockedRooms && currentUnlockedRooms.has(3)) {
       this.createGoToRoomButton(720, buttonY, 3);
@@ -101,21 +109,30 @@ export class RoomNavigationManager {
 
   createGoToRoomButton(x: number, y: number, roomNumber: number) {
     const roomNames = { 2: "PHÒNG 2", 3: "PHÒNG 3" };
-    
+
     const buttonBg = this.scene.add.rectangle(x, y, 160, 50, 0x2d5a27, 0.8);
     buttonBg.setStrokeStyle(2, 0x4caf50);
     buttonBg.setDepth(10);
     buttonBg.setInteractive({ cursor: "pointer" });
 
-    const buttonText = this.scene.add.text(x, y, roomNames[roomNumber as keyof typeof roomNames], {
-      fontSize: "14px",
-      color: "#ffffff",
-      fontStyle: "bold",
-    });
+    const buttonText = this.scene.add.text(
+      x,
+      y,
+      roomNames[roomNumber as keyof typeof roomNames],
+      {
+        fontSize: "14px",
+        color: "#ffffff",
+        fontStyle: "bold",
+      }
+    );
     buttonText.setOrigin(0.5);
     buttonText.setDepth(11);
 
-    this.goToRoomButtons.push({ bg: buttonBg, text: buttonText, room: roomNumber });
+    this.goToRoomButtons.push({
+      bg: buttonBg,
+      text: buttonText,
+      room: roomNumber,
+    });
 
     buttonBg.on("pointerdown", () => {
       this.teleportToRoom(roomNumber);
@@ -166,13 +183,18 @@ export class RoomNavigationManager {
 
     this.playerMovement.teleportTo(720, 480);
     (window as any).currentRoom = 1;
-    (this.scene as any).sceneSetupManager.updateCameraBounds(1);
+
+    // Update camera bounds for Room 1 and ensure camera follows the player
+    (this.scene as any).roomManager.updateCameraBounds(this.scene.cameras, 1);
+    const p = this.playerMovement.getPlayer();
+    this.scene.cameras.main.startFollow(p, true, 0.1, 0.1);
+    this.scene.cameras.main.centerOn(p.x, p.y);
   }
 
   teleportToRoom(roomNumber: number) {
     const player = this.playerMovement.getPlayer();
     let targetX: number;
-    
+
     const map = (this.scene as any).map;
     const map2 = (this.scene as any).map2;
 
@@ -209,7 +231,15 @@ export class RoomNavigationManager {
 
     this.playerMovement.teleportTo(targetX, 480);
     (window as any).currentRoom = roomNumber;
-    (this.scene as any).sceneSetupManager.updateCameraBounds(roomNumber);
+
+    // Update camera bounds for the target room and ensure camera follows the player
+    (this.scene as any).roomManager.updateCameraBounds(
+      this.scene.cameras,
+      roomNumber
+    );
+    const p = this.playerMovement.getPlayer();
+    this.scene.cameras.main.startFollow(p, true, 0.1, 0.1);
+    this.scene.cameras.main.centerOn(p.x, p.y);
   }
 
   getBackButtons() {
