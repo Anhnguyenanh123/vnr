@@ -44,8 +44,9 @@ export function getAllowedOrigins(): string[] {
   if (clientUrl) origins.push(clientUrl);
   if (serverUrl) origins.push(serverUrl);
 
-  origins.push("https://vnr202.hyudequeue.xyz");
+  origins.push("https://mln131.hyudequeue.xyz");
   origins.push("https://mln131-internal.hyudequeue.xyz");
+  origins.push("https://vnr202.hyudequeue.xyz");
   origins.push("http://localhost:25576");
 
   if (process.env.NODE_ENV === "development") {
