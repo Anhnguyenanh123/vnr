@@ -22,7 +22,7 @@ export function getServerUrl(): string {
  * Get client URL
  */
 export function getClientUrl(): string {
-  return getEnvVar("CLIENT_URL", "https://mln131.hyudequeue.xyz");
+  return getEnvVar("CLIENT_URL", "https://vnr202.hyudequeue.xyz");
 }
 
 /**
@@ -44,7 +44,7 @@ export function getAllowedOrigins(): string[] {
   if (clientUrl) origins.push(clientUrl);
   if (serverUrl) origins.push(serverUrl);
 
-  origins.push("https://mln131.hyudequeue.xyz");
+  origins.push("https://vnr202.hyudequeue.xyz");
   origins.push("https://mln131-internal.hyudequeue.xyz");
 
   if (process.env.NODE_ENV === "development") {

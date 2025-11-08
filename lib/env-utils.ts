@@ -23,7 +23,7 @@ export function getServerUrl(): string {
 }
 
 export function getClientUrl(): string {
-  return getEnvVar("CLIENT_URL", "https://mln131.hyudequeue.xyz");
+  return getEnvVar("CLIENT_URL", "https://vnr202.hyudequeue.xyz");
 }
 
 export function getServerPort(): number {
