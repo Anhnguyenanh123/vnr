@@ -251,7 +251,7 @@ export default function MuseumPage() {
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex-1">
             <h1 className="text-3xl md:text-4xl font-bold text-center text-[#e8e8e8] tracking-tight">
-              BẢO TÀNG CHỦ NGHĨA XÃ HỘI KHOA HỌC
+              BẢO TÀNG VỀ DIỄN BIẾN ĐIỆN BIÊN PHỦ TRÊN KHÔNG
             </h1>
             <p className="text-center text-[#94a3b8] mt-2 text-sm">
               Sử dụng phím mũi tên hoặc WASD để di chuyển • Nhấn E để xem nội
