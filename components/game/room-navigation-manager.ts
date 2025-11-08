@@ -184,11 +184,35 @@ export class RoomNavigationManager {
     this.playerMovement.teleportTo(720, 480);
     (window as any).currentRoom = 1;
 
-    // Update camera bounds for Room 1 and ensure camera follows the player
-    (this.scene as any).roomManager.updateCameraBounds(this.scene.cameras, 1);
+    // Get map dimensions
+    const map = (this.scene as any).map;
+    const map2 = (this.scene as any).map2;
+    const map3 = (this.scene as any).map3;
+
+    // Calculate total world bounds
+    const totalWidth =
+      map.widthInPixels + map2.widthInPixels + map3.widthInPixels;
+    const totalHeight = Math.max(
+      map.heightInPixels,
+      map2.heightInPixels,
+      map3.heightInPixels
+    );
+
+    // Update camera bounds to entire world first
+    this.scene.cameras.main.setBounds(0, 0, totalWidth, totalHeight);
+
+    // Get player and force camera follow
     const p = this.playerMovement.getPlayer();
+    this.scene.cameras.main.stopFollow();
     this.scene.cameras.main.startFollow(p, true, 0.1, 0.1);
+
+    // Center camera immediately on player
     this.scene.cameras.main.centerOn(p.x, p.y);
+
+    // Small delay to ensure smooth transition
+    this.scene.time.delayedCall(50, () => {
+      this.scene.cameras.main.centerOn(p.x, p.y);
+    });
   }
 
   teleportToRoom(roomNumber: number) {
@@ -197,6 +221,7 @@ export class RoomNavigationManager {
 
     const map = (this.scene as any).map;
     const map2 = (this.scene as any).map2;
+    const map3 = (this.scene as any).map3;
 
     switch (roomNumber) {
       case 2:
@@ -232,14 +257,30 @@ export class RoomNavigationManager {
     this.playerMovement.teleportTo(targetX, 480);
     (window as any).currentRoom = roomNumber;
 
-    // Update camera bounds for the target room and ensure camera follows the player
-    (this.scene as any).roomManager.updateCameraBounds(
-      this.scene.cameras,
-      roomNumber
+    // Calculate total world bounds
+    const totalWidth =
+      map.widthInPixels + map2.widthInPixels + map3.widthInPixels;
+    const totalHeight = Math.max(
+      map.heightInPixels,
+      map2.heightInPixels,
+      map3.heightInPixels
     );
+
+    // Update camera bounds to entire world
+    this.scene.cameras.main.setBounds(0, 0, totalWidth, totalHeight);
+
+    // Get player and force camera follow
     const p = this.playerMovement.getPlayer();
+    this.scene.cameras.main.stopFollow();
     this.scene.cameras.main.startFollow(p, true, 0.1, 0.1);
+
+    // Center camera immediately on player
     this.scene.cameras.main.centerOn(p.x, p.y);
+
+    // Small delay to ensure smooth transition
+    this.scene.time.delayedCall(50, () => {
+      this.scene.cameras.main.centerOn(p.x, p.y);
+    });
   }
 
   getBackButtons() {
