@@ -95,6 +95,7 @@ export default function Minimap({
         />
       </div>
 
+      {/* Legend */}
       <div className="mt-2 text-xs text-[#94a3b8] space-y-1">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 bg-[#4ade80] rounded-full" />
@@ -107,7 +108,7 @@ export default function Minimap({
               unlockedRooms.has(1) ? "text-[#3b82f6]" : "text-[#64748b]"
             }`}
           >
-            2.2.2. Lãnh đạo cách mạng cả nước (1965 – 1975){" "}
+            Phòng 1: Cuộc tập kích chiến lược và kế hoạch của Nixon{" "}
             {unlockedRooms.has(1) ? "✓" : "🔒"}
           </div>
           <div
@@ -115,16 +116,16 @@ export default function Minimap({
               unlockedRooms.has(2) ? "text-[#ef4444]" : "text-[#64748b]"
             }`}
           >
-            2.2.3. Ý nghĩa lịch sử và kinh nghiệm lãnh đạo của Đảng thời kỳ 1954
-            – 1975 {unlockedRooms.has(2) ? "✓" : "🔒"}
+            Phòng 2: Tấn công Đài Tiếng nói Việt Nam và thảm họa Khâm Thiên{" "}
+            {unlockedRooms.has(2) ? "✓" : "🔒"}
           </div>
           <div
             className={`font-semibold ${
               unlockedRooms.has(3) ? "text-[#f59e0b]" : "text-[#64748b]"
             }`}
           >
-            CQ6 : Tại sao "Mỹ chỉ chịu thua khi chúng thua trên bầu trời Hà
-            Nội"? {unlockedRooms.has(3) ? "✓" : "🔒"}
+            Phòng 3: Anh hùng bầu trời & Chiến thắng Điện Biên Phủ trên không{" "}
+            {unlockedRooms.has(3) ? "✓" : "🔒"}
           </div>
         </div>
       </div>
