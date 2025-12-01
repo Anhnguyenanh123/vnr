@@ -3,122 +3,130 @@ import type { ExhibitData } from "@/types/museum";
 export const museumData: ExhibitData[] = [
   {
     id: "room1-exhibit1",
-    title: "Cuộc tập kích chiến lược của Mỹ tháng 12/1972",
+    title: "Giai đoạn trước 1911: Hình thành tư tưởng yêu nước",
     position: { x: 300, y: 300 },
     roomNumber: 1,
     image: "/pic/r1-e1.webp",
-    content: `## **Mở đầu cuộc tập kích**
-Tháng 12 năm 1972, Mỹ mở cuộc tập kích chiến lược bằng máy bay B-52 quy mô lớn nhất trong Chiến tranh Việt Nam, nhằm buộc Việt Nam Dân chủ Cộng hòa phải khuất phục trên bàn đàm phán Paris.
+    content: `
+**Hồ Chí Minh** sinh ra trong gia đình nhà nho yêu nước tại **Nghệ An** – vùng đất giàu truyền thống chống ngoại xâm.
 
-Trong 12 ngày đêm khói lửa, Thủ đô Hà Nội cùng Hải Phòng và các địa phương miền Bắc trở thành trọng điểm ném bom ác liệt. Máy bay B-52 và F-111 liên tiếp trút bom xuống khu dân cư, bệnh viện, trường học, ga Hàng Cỏ, phố Khâm Thiên…
+Những yếu tố ảnh hưởng lớn:
 
----
+- Truyền thống yêu nước của gia đình  
+- Quê hương giàu tinh thần cách mạng  
+- Trải nghiệm học tập và làm việc từ **Huế → Phan Thiết → Sài Gòn**  
+- Chứng kiến sự đàn áp dã man của thực dân Pháp  
 
-## **Tinh thần "Quyết tử cho Tổ quốc quyết sinh"**
-Với ý chí kiên cường và tinh thần "Quyết tử cho Tổ quốc quyết sinh", quân dân miền Bắc, đặc biệt là lực lượng Phòng không – Không quân, đã sẵn sàng chiến đấu bảo vệ bầu trời Tổ quốc.`,
+Những điều đó hun đúc ý chí tìm con đường cứu nước mới.  
+Năm **1911**, Người rời **bến Nhà Rồng**, mở đầu hành trình tìm đường giải phóng dân tộc.
+`,
   },
+
   {
     id: "room1-exhibit2",
-    title: "Kế hoạch tấn công của Nixon",
+    title: "1911–1920: Tìm đường cứu nước – tiếp cận chủ nghĩa Mác – Lênin",
     position: { x: 300, y: 600 },
     roomNumber: 1,
     image: "/pic/r1-e2.jpg",
-    content: `## **Quyết định của Tổng thống Nixon**
-Ngày 14 tháng 12 năm 1972, Tổng thống Nixon đã phê duyệt kế hoạch tấn công bằng đường không vào Hà Nội và Hải Phòng.
+    content: `
+Trong hành trình qua nhiều châu lục, Hồ Chí Minh:
 
----
+- Nhận ra bản chất tàn bạo của **chủ nghĩa thực dân**
+- Thấy rõ sự hạn chế của các cuộc cách mạng tư sản
+- Tìm hiểu những con đường giải phóng dân tộc trên thế giới  
 
-## **Máy bay B-52 Stratofortress**
-Không quân Hoa Kỳ tiến hành các cuộc không kích bằng máy bay ném bom chiến lược **B-52 Stratofortress**, tầm xa, siêu thanh, động cơ phản lực – biểu tượng của sức mạnh quân sự Mỹ thời bấy giờ.
+**Bước ngoặt lịch sử (1920):**
 
----
+- Tiếp cận *Luận cương về vấn đề dân tộc và thuộc địa* của Lênin  
+- Khẳng định cách mạng Việt Nam phải đi theo **con đường cách mạng vô sản**  
+- Tham gia thành lập **Đảng Cộng sản Pháp** tại Đại hội Tua  
 
-## **Phá hủy Bệnh viện Bạch Mai**
-Máy bay ném bom B-52 đã phá hủy hoàn toàn **Bệnh viện Bạch Mai** ở Hà Nội, cho thấy sự tàn bạo của chiến dịch ném bom không chỉ nhắm vào mục tiêu quân sự mà cả dân sự.`,
+Đây là bước chuyển từ **chủ nghĩa yêu nước** sang **lập trường Mác – Lênin**.
+`,
   },
 
   {
     id: "room2-exhibit1",
-    title: "Tấn công Đài Tiếng nói Việt Nam",
+    title: "1920–1930: Xây dựng nền tảng tư tưởng cách mạng Việt Nam",
     position: { x: 300, y: 900 },
     roomNumber: 2,
     image: "/pic/r2-e1.png",
-    content: `## **VOV bị tấn công**
-Đài phát thanh Mễ Trì của Đài Tiếng nói Việt Nam (VOV) bị tấn công vào đêm 18 tháng 12. 
+    content: `
+Những đóng góp quan trọng của Hồ Chí Minh thập niên 1920:
 
-Mặc dù thiệt hại về tài sản nặng nề, VOV vẫn kiên cường **phát sóng trở lại chỉ sau 9 phút im lặng** – một minh chứng cho tinh thần bất khuất của báo chí cách mạng Việt Nam.`,
+- Viết tác phẩm **“Bản án chế độ thực dân Pháp”**  
+- Thành lập **Hội Việt Nam Cách mạng Thanh niên**  
+- Mở lớp đào tạo cán bộ cách mạng  
+- Biên soạn **“Đường Kách Mệnh”**  
+- Hoạt động sôi nổi trong phong trào cộng sản quốc tế  
+
+Năm **1930**, Người chủ trì hợp nhất các tổ chức cộng sản, thành lập **Đảng Cộng sản Việt Nam** và soạn **Cương lĩnh đầu tiên**, xác định đúng đắn con đường cách mạng Việt Nam.
+`,
   },
+
   {
     id: "room2-exhibit2",
-    title: "Thảm họa phố Khâm Thiên",
+    title: "1930–1941: Kiên định và bảo vệ đường lối cách mạng",
     position: { x: 700, y: 600 },
     roomNumber: 2,
     image: "/pic/r2-e2.jpg",
-    content: `## **Đêm kinh hoàng 26/12/1972**
-Phố Khâm Thiên ở Hà Nội bị đổ nát vào đêm ngày 26 tháng 12. 
+    content: `
+Dù trải qua nhiều thử thách, Hồ Chí Minh vẫn kiên định với con đường cách mạng:
 
-**Tổng cộng có 278 người thiệt mạng**, chủ yếu là phụ nữ, người già và trẻ em.
+- Bị bắt tại Hồng Kông (1931–1934)
+- Tiếp tục hoạt động tại Liên Xô và Trung Quốc  
+- Nghiên cứu lý luận để củng cố đường lối giải phóng dân tộc  
 
-Đây là một trong những tổn thất dân sự nặng nề nhất trong 12 ngày đêm khói lửa.
+Năm **1941**, Người trở về Pác Bó:
 
----
+- Mở lớp huấn luyện cán bộ  
+- Biên soạn “**Con đường giải phóng**”  
+- Lãnh đạo chuẩn bị cho **Tổng khởi nghĩa 1945**  
 
-## **Sơ tán dân cư và kháng chiến**
-
-### **Người dân được sơ tán an toàn**
-Trong những ngày bị ném bom dữ dội, người dân đã được **sơ tán đến nơi an toàn**, đặc biệt là phụ nữ, trẻ em và người già.
-
-### **Hầm trú bom ven đường**
-Các hầm trú bom ven đường cá nhân được dựng lên dọc theo các con phố, sẵn sàng cho người dân trú ẩn khi còi báo động vang lên.
-
-### **Lính pháo binh trực chiến**
-Các cuộc không kích của Mỹ đã vấp phải sự kháng cự mạnh mẽ của người dân Việt Nam. Lính pháo binh kiên cường đang trực chiến, bảo vệ bầu trời Thủ đô.`,
+Đây là giai đoạn xây dựng lực lượng và chuẩn bị trực tiếp cho cách mạng.
+`,
   },
 
   {
     id: "room3-exhibit1",
-    title: "Anh hùng không quân và chiến tích vang dội",
+    title: "Giá trị của tư tưởng Hồ Chí Minh đối với cách mạng Việt Nam",
     position: { x: 1300, y: 300 },
     roomNumber: 3,
     image: "/pic/r3-e1.jpg",
-    content: `## **Đơn vị Không quân Sao Đỏ**
-Đơn vị không quân Sao Đỏ đã góp phần quan trọng vào chiến thắng của trận chiến.
+    content: `
+Giai đoạn **1941–1969**, tư tưởng Hồ Chí Minh đã soi đường cho:
 
-Các phi công Việt Nam dũng cảm xuất kích, đối đầu trực tiếp với máy bay chiến lược B-52 của Mỹ.
+- Cách mạng Tháng Tám 1945  
+- Kháng chiến chống Pháp  
+- Kháng chiến chống Mỹ  
+- Xây dựng Nhà nước Việt Nam Dân chủ Cộng hòa  
 
----
+Những giá trị cốt lõi:
 
-## **Anh hùng Phạm Tuân**
-**Anh hùng Phạm Tuân** lái máy bay **MiG-21** đã lập nên chiến công lịch sử: **bắn rơi máy bay ném bom B-52**.
-
-Đây là lần đầu tiên trong lịch sử không chiến, một máy bay tiêm kích hạ gục được "pháo đài bay" B-52.
-
----
-
-## **Phi công Mỹ bị bắt**
-Một phi công Mỹ bị bắt trên **hồ Trúc Bạch** ở Hà Nội sau khi máy bay bị bắn rơi.
-
-Các phi công Mỹ bị giam giữ tại **Nhà tù Hỏa Lò** ở Hà Nội, nơi họ nhận được bữa ăn hàng ngày theo quy định.`,
+- Độc lập dân tộc gắn liền với **chủ nghĩa xã hội**  
+- Đại đoàn kết dân tộc  
+- Nhà nước của dân – do dân – vì dân  
+- Đạo đức cách mạng  
+- Mục tiêu: **“Dân giàu, nước mạnh, dân chủ, công bằng, văn minh”**
+`,
   },
+
   {
     id: "room3-exhibit2",
-    title: "Chiến thắng Điện Biên Phủ trên không",
+    title: "Giá trị của tư tưởng Hồ Chí Minh đối với nhân loại",
     position: { x: 1300, y: 600 },
     roomNumber: 3,
     image: "/pic/r3-e2.jpg",
-    content: `## **81 máy bay Mỹ bị bắn rơi**
-Quân dân miền Bắc, đặc biệt là lực lượng Phòng không – Không quân, đã **bắn rơi 81 máy bay Mỹ**, trong đó có **34 chiếc B-52**, làm nên chiến thắng vang dội **"Điện Biên Phủ trên không"**.
+    content: `
+Tư tưởng Hồ Chí Minh góp phần vào tiến bộ nhân loại thông qua:
 
----
+- Khát vọng hòa bình  
+- Đấu tranh chống áp bức, bóc lột  
+- Khẳng định quyền của dân tộc thuộc địa  
+- Tinh thần **đoàn kết quốc tế**  
+- Quan điểm “**làm bạn với tất cả các nước dân chủ**”  
 
-## **Xác máy bay B-52 giữa Hà Nội**
-Xác máy bay ném bom B-52 rơi ngổn ngang **giữa trung tâm thành phố Hà Nội** – minh chứng rõ ràng cho thất bại của chiến dịch ném bom Mỹ.
-
----
-
-## **Hiệp định Paris 27/1/1973**
-Thất bại của các cuộc không kích đã buộc Mỹ phải ngồi vào bàn đàm phán năm 1973 và ký **Hiệp định Paris**.
-
-**Bà Nguyễn Thị Bình**, Bộ trưởng Ngoại giao Chính phủ Cách mạng Lâm thời Cộng hòa miền Nam Việt Nam, đã ký hiệp định vào ngày **27 tháng 1 năm 1973**, chấm dứt chiến tranh, lập lại hòa bình ở Việt Nam.`,
+Người trở thành biểu tượng của phong trào giải phóng dân tộc thế kỷ XX, đóng góp vào lương tri và văn minh nhân loại.
+`,
   },
 ];

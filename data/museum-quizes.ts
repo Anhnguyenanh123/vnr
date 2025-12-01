@@ -6,203 +6,174 @@ export const roomQuizzes: RoomQuiz[] = [
     questions: [
       {
         question:
-          "Mục tiêu chính của cuộc tập kích chiến lược của Mỹ tháng 12/1972 là gì?",
+          "Yếu tố nào đã góp phần quan trọng hình thành tư tưởng yêu nước của Hồ Chí Minh trước năm 1911?",
         options: [
-          "Hủy diệt lực lượng không quân Việt Nam",
-          "Buộc Việt Nam Dân chủ Cộng hòa khuất phục trên bàn đàm phán Paris",
-          "Hỗ trợ quân đội miền Nam Việt Nam",
-          "Kiểm soát tuyến đường Hồ Chí Minh",
-        ],
-        correctAnswer: 1,
-      },
-      {
-        question: "Cuộc tập kích kéo dài bao nhiêu ngày đêm?",
-        options: ["7 ngày đêm", "12 ngày đêm", "18 ngày đêm", "30 ngày đêm"],
-        correctAnswer: 1,
-      },
-      {
-        question:
-          "Quân dân miền Bắc đã bắn rơi tổng cộng bao nhiêu máy bay Mỹ trong chiến dịch này?",
-        options: ["34 chiếc", "81 chiếc", "100 chiếc", "50 chiếc"],
-        correctAnswer: 1,
-      },
-      {
-        question:
-          "Chiến thắng 'Điện Biên Phủ trên không' đã buộc Mỹ ký hiệp định nào?",
-        options: [
-          "Hiệp định Genève",
-          "Hiệp định Paris ngày 27/1/1973",
-          "Hiệp định Sơ bộ 1946",
-          "Hiệp định Potsdam",
-        ],
-        correctAnswer: 1,
-      },
-      {
-        question:
-          "Ngày nào Tổng thống Nixon phê duyệt kế hoạch tấn công bằng đường không vào Hà Nội và Hải Phòng?",
-        options: [
-          "Ngày 18 tháng 12 năm 1972",
-          "Ngày 14 tháng 12 năm 1972",
-          "Ngày 26 tháng 12 năm 1972",
-          "Ngày 27 tháng 1 năm 1973",
-        ],
-        correctAnswer: 1,
-      },
-    ],
-  },
-  {
-    roomNumber: 2,
-    questions: [
-      {
-        question: "Đài Tiếng nói Việt Nam (VOV) bị tấn công vào đêm ngày nào?",
-        options: ["14 tháng 12", "18 tháng 12", "26 tháng 12", "27 tháng 1"],
-        correctAnswer: 1,
-      },
-      {
-        question:
-          "Sau khi bị tấn công, Đài Tiếng nói Việt Nam tiếp tục phát sóng sau bao lâu?",
-        options: [
-          "9 phút im lặng",
-          "1 giờ im lặng",
-          "9 giờ im lặng",
-          "1 ngày im lặng",
+          "Từ gia đình và quê hương giàu truyền thống yêu nước",
+          "Từ ảnh hưởng của văn học phương Tây",
+          "Từ việc tham gia phong trào Đông Du",
+          "Từ phong trào công nhân châu Âu",
         ],
         correctAnswer: 0,
       },
       {
         question:
-          "Các cuộc không kích của Mỹ chủ yếu nhắm vào những mục tiêu nào?",
+          "Năm 1911, Hồ Chí Minh đã thực hiện sự kiện gì có ý nghĩa quan trọng trong hành trình tìm đường cứu nước?",
         options: [
-          "Chỉ các mục tiêu quân sự",
-          "Các mục tiêu dân sự như khu dân cư, bệnh viện",
-          "Chỉ các sân bay không quân",
-          "Các tuyến đường bộ",
+          "Gia nhập Đảng Cộng sản Pháp",
+          "Khởi hành từ bến Nhà Rồng ra đi tìm đường cứu nước",
+          "Thành lập Hội Việt Nam Cách mạng Thanh niên",
+          "Viết tác phẩm 'Đường Kách Mệnh'",
         ],
         correctAnswer: 1,
       },
       {
-        question: "Phố Khâm Thiên bị đổ nát vào đêm ngày nào?",
-        options: ["14 tháng 12", "18 tháng 12", "26 tháng 12", "27 tháng 1"],
+        question: "Vì sao Hồ Chí Minh lựa chọn con đường cách mạng vô sản?",
+        options: [
+          "Do phong trào yêu nước trong nước đã thành công",
+          "Do tiếp cận Luận cương Lênin năm 1920",
+          "Do ảnh hưởng của cách mạng tư sản Anh",
+          "Do học tập tại trường quân sự",
+        ],
+        correctAnswer: 1,
+      },
+      {
+        question:
+          "Sự kiện nào đánh dấu bước chuyển từ chủ nghĩa yêu nước sang lập trường Mác – Lênin?",
+        options: [
+          "Thành lập Đảng Cộng sản Pháp",
+          "Tham gia Đại hội Tua năm 1920",
+          "Trở về Việt Nam năm 1941",
+          "Viết tác phẩm 'Bản án chế độ thực dân Pháp'",
+        ],
+        correctAnswer: 1,
+      },
+      {
+        question:
+          "Hoạt động của Hồ Chí Minh giai đoạn 1911–1920 chủ yếu nhằm mục tiêu gì?",
+        options: [
+          "Tìm con đường cứu nước mới",
+          "Chuẩn bị khởi nghĩa vũ trang",
+          "Xây dựng lực lượng cách mạng trong nước",
+          "Tập hợp trí thức Việt Nam",
+        ],
+        correctAnswer: 0,
+      },
+    ],
+  },
+
+  {
+    roomNumber: 2,
+    questions: [
+      {
+        question:
+          "Tác phẩm nào của Hồ Chí Minh vạch trần bản chất tàn bạo của chủ nghĩa thực dân?",
+        options: [
+          "Đường Kách Mệnh",
+          "Con đường giải phóng",
+          "Bản án chế độ thực dân Pháp",
+          "Tuyên ngôn Độc lập",
+        ],
         correctAnswer: 2,
       },
       {
         question:
-          "Tổng số người thiệt mạng ở phố Khâm Thiên là bao nhiêu, chủ yếu là ai?",
+          "Tổ chức cách mạng nào Hồ Chí Minh sáng lập trong thập niên 1920?",
         options: [
-          "178 người, chủ yếu là nam giới",
-          "278 người, chủ yếu là phụ nữ, người già và trẻ em",
-          "378 người, chủ yếu là binh sĩ",
-          "100 người, chủ yếu là trẻ em",
+          "Việt Minh",
+          "Hội Việt Nam Cách mạng Thanh niên",
+          "Mặt trận Tổ quốc",
+          "Quốc tế Cộng sản",
+        ],
+        correctAnswer: 1,
+      },
+      {
+        question: "Sự kiện nào đánh dấu sự ra đời của Đảng Cộng sản Việt Nam?",
+        options: [
+          "Hội nghị Trung ương 1941",
+          "Khởi nghĩa Bắc Sơn",
+          "Hợp nhất các tổ chức cộng sản năm 1930",
+          "Khởi nghĩa Nam Kỳ",
+        ],
+        correctAnswer: 2,
+      },
+      {
+        question:
+          "Trong thời gian bị bắt (1931–1934), Hồ Chí Minh thể hiện điều gì về đường lối cách mạng?",
+        options: [
+          "Thay đổi lập trường",
+          "Kiên định bảo vệ quan điểm giải phóng dân tộc",
+          "Rời bỏ phong trào cách mạng",
+          "Chuyển hướng sang đấu tranh nghị trường",
+        ],
+        correctAnswer: 1,
+      },
+      {
+        question: "Tác phẩm nào Hồ Chí Minh soạn khi trở về Pác Bó năm 1941?",
+        options: [
+          "Đường Kách Mệnh",
+          "Con đường giải phóng",
+          "Nhật ký trong tù",
+          "Tuyên ngôn Độc lập",
         ],
         correctAnswer: 1,
       },
     ],
   },
+
   {
     roomNumber: 3,
     questions: [
       {
         question:
-          "Trong cuộc không kích, người dân Hà Nội đã làm gì để bảo vệ tính mạng?",
+          "Tư tưởng Hồ Chí Minh đã góp phần quyết định vào thắng lợi lịch sử nào?",
         options: [
-          "Tiếp tục sinh hoạt bình thường",
-          "Sơ tán đến nơi an toàn và xây dựng hầm trú bom",
-          "Di chuyển đến miền Nam",
-          "Ẩn náu trong các tòa nhà cao tầng",
-        ],
-        correctAnswer: 1,
-      },
-      {
-        question: "Các hầm trú bom được dựng ở đâu?",
-        options: [
-          "Trong các bệnh viện",
-          "Ven đường cá nhân dọc theo các con phố",
-          "Dưới các trường học",
-          "Tại các ga tàu",
+          "Chiến thắng Điện Biên Phủ",
+          "Cách mạng Tháng Tám năm 1945 và các cuộc kháng chiến sau đó",
+          "Kháng chiến chống Thanh – Nguyên",
+          "Phong trào Duy Tân",
         ],
         correctAnswer: 1,
       },
       {
         question:
-          "Lực lượng nào đã trực chiến mạnh mẽ chống lại các cuộc không kích?",
+          "Nội dung nào KHÔNG thuộc giá trị tư tưởng Hồ Chí Minh đối với cách mạng Việt Nam?",
         options: [
-          "Lực lượng bộ binh",
-          "Lính pháo binh và đơn vị không quân Sao Đỏ",
-          "Lực lượng hải quân",
-          "Dân quân tự vệ địa phương",
+          "Độc lập dân tộc gắn liền với chủ nghĩa xã hội",
+          "Nhà nước của dân, do dân, vì dân",
+          "Phát triển chủ nghĩa thực dân mới",
+          "Đại đoàn kết dân tộc",
+        ],
+        correctAnswer: 2,
+      },
+      {
+        question:
+          "Tư tưởng Hồ Chí Minh về quan hệ quốc tế thể hiện rõ nhất ở điểm nào?",
+        options: [
+          "Tách mình khỏi thế giới",
+          "Làm bạn với tất cả các nước dân chủ",
+          "Liên minh quân sự với một quốc gia duy nhất",
+          "Không tham gia các tổ chức quốc tế",
         ],
         correctAnswer: 1,
       },
       {
         question:
-          "Tinh thần của quân dân miền Bắc trong cuộc kháng cự được thể hiện như thế nào?",
+          "Vì sao Hồ Chí Minh trở thành biểu tượng của phong trào giải phóng dân tộc thế kỷ XX?",
         options: [
-          "Sẵn sàng đầu hàng",
-          "Ngày đêm sẵn sàng chiến đấu với quyết tâm sắt đá",
-          "Chỉ phòng thủ thụ động",
-          "Yêu cầu đàm phán ngay lập tức",
+          "Do thành tựu quân sự vượt trội",
+          "Do tư tưởng giải phóng dân tộc gắn với tiến bộ xã hội và hòa bình",
+          "Do xuất thân từ gia đình quý tộc",
+          "Do phát minh các học thuyết kinh tế",
         ],
         correctAnswer: 1,
       },
       {
-        question:
-          "Nhân dân Hà Nội thể hiện tinh thần gì dù đối mặt với bom đạn ác liệt?",
+        question: "Tư tưởng đạo đức của Hồ Chí Minh nhấn mạnh điều gì?",
         options: [
-          "Hoảng loạn và chạy trốn",
-          "Kiên cường, tổ chức sơ tán và trú ẩn hiệu quả",
-          "Tấn công trực tiếp vào máy bay Mỹ",
-          "Bỏ chạy khỏi thành phố",
-        ],
-        correctAnswer: 1,
-      },
-    ],
-  },
-  {
-    roomNumber: 4,
-    questions: [
-      {
-        question: "Anh hùng Phạm Tuân đã lái loại máy bay nào để bắn rơi B-52?",
-        options: [
-          "Máy bay B-52",
-          "Máy bay MiG-21",
-          "Máy bay F-111",
-          "Máy bay Stratofortress",
-        ],
-        correctAnswer: 1,
-      },
-      {
-        question: "Một phi công Mỹ bị bắt ở đâu tại Hà Nội?",
-        options: [
-          "Sân bay Nội Bài",
-          "Hồ Trúc Bạch",
-          "Phố Khâm Thiên",
-          "Bệnh viện Bạch Mai",
-        ],
-        correctAnswer: 1,
-      },
-      {
-        question: "Các phi công Mỹ bị bắt được giam giữ ở đâu?",
-        options: [
-          "Nhà tù Hỏa Lò",
-          "Trại giam Phú Quốc",
-          "Đài Tiếng nói Việt Nam",
-          "Hầm trú bom",
-        ],
-        correctAnswer: 0,
-      },
-      {
-        question: "Hiệp định Paris được ký vào ngày nào năm 1973?",
-        options: ["27 tháng 1", "14 tháng 12", "18 tháng 12", "26 tháng 12"],
-        correctAnswer: 0,
-      },
-      {
-        question:
-          "Ai là người ký Hiệp định Paris đại diện cho Chính phủ Cách mạng Lâm thời Cộng hòa miền Nam Việt Nam?",
-        options: [
-          "Tổng thống Nixon",
-          "Bà Nguyễn Thị Bình",
-          "Anh hùng Phạm Tuân",
-          "Tổng Bí thư Lê Duẩn",
+          "Lối sống xa hoa để thể hiện vị thế",
+          "Đạo đức cách mạng, cần – kiệm – liêm – chính",
+          "Tập trung tối đa vào phát triển kinh tế",
+          "Ưu tiên lợi ích của cá nhân",
         ],
         correctAnswer: 1,
       },

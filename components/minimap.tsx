@@ -108,7 +108,7 @@ export default function Minimap({
               unlockedRooms.has(1) ? "text-[#3b82f6]" : "text-[#64748b]"
             }`}
           >
-            Phòng 1: Cuộc tập kích chiến lược và kế hoạch của Nixon{" "}
+            Phòng 1: Hành trình tìm đường cứu nước (1911–1920){" "}
             {unlockedRooms.has(1) ? "✓" : "🔒"}
           </div>
           <div
@@ -116,7 +116,7 @@ export default function Minimap({
               unlockedRooms.has(2) ? "text-[#ef4444]" : "text-[#64748b]"
             }`}
           >
-            Phòng 2: Tấn công Đài Tiếng nói Việt Nam và thảm họa Khâm Thiên{" "}
+            Phòng 2: Hình thành tư tưởng cách mạng Việt Nam (1920–1945){" "}
             {unlockedRooms.has(2) ? "✓" : "🔒"}
           </div>
           <div
@@ -124,7 +124,7 @@ export default function Minimap({
               unlockedRooms.has(3) ? "text-[#f59e0b]" : "text-[#64748b]"
             }`}
           >
-            Phòng 3: Anh hùng bầu trời & Chiến thắng Điện Biên Phủ trên không{" "}
+            Phòng 3: Giá trị và ảnh hưởng của tư tưởng Hồ Chí Minh{" "}
             {unlockedRooms.has(3) ? "✓" : "🔒"}
           </div>
         </div>
