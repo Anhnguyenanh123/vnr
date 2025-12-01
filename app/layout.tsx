@@ -4,9 +4,9 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Bảo tàng Điện Biên Phủ Trên Không",
+  title: "Bảo tàng Tư tưởng Hồ Chí Minh",
   description:
-    "Khám phá 12 ngày đêm khói lửa Hà Nội tháng 12/1972 - Chiến thắng vang dội đánh bại cuộc tập kích chiến lược của Mỹ",
+    "Khám phá quá trình hình thành và phát triển tư tưởng Hồ Chí Minh, từ hành trình tìm đường cứu nước, hình thành cách mạng Việt Nam, đến giá trị đối với dân tộc và nhân loại.",
 };
 
 export default function RootLayout({
