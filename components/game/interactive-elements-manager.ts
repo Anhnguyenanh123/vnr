@@ -120,8 +120,7 @@ export class InteractiveElementsManager {
         y: 100,
         id: 1,
         imagePath: "/pic/r1-e3.jpg",
-        caption:
-          "Đài phát thanh Mễ Trì của Đài Tiếng nói Việt Nam (VOV) bị tấn công vào đêm 18 tháng 12. Mặc dù thiệt hại về tài sản nặng nề, VOV vẫn tiếp tục phát sóng sau 9 phút im lặng.",
+        caption: "Chân dung Bác Hồ thời trẻ bên lá cờ Đảng",
       },
       {
         x: sectionWidth * 1.5,
@@ -129,38 +128,35 @@ export class InteractiveElementsManager {
         id: 2,
         imagePath: "/pic/r1-e4.jpg",
         caption:
-          "Các hầm trú bom ven đường cá nhân được dựng lên dọc theo các con phố.",
+          'Hình ảnh minh họa về tư tưởng của Chủ tịch Hồ Chí Minh với câu nói: "Bài báo ấy của Bác vẫn có giá trị để đời cho sự nghiệp xây dựng, chỉnh đốn Đảng của chúng ta."',
       },
       {
         x: sectionWidth * 2.5,
         y: 100,
         id: 3,
         imagePath: "/pic/r2-e3.jpg",
-        caption:
-          "Đơn vị không quân Sao Đỏ đã góp phần vào chiến thắng của trận chiến.",
+        caption: "Chân dung Bác Hồ thời thanh niên",
       },
       {
         x: sectionWidth * 3.5,
         y: 100,
         id: 4,
         imagePath: "/pic/r1-e5.jpg",
-        caption: "Một phi công Mỹ bị bắt trên hồ Trúc Bạch ở Hà Nội.",
+        caption: "Bác Hồ miệt mài soạn thảo tài liệu cách mạng",
       },
       {
         x: sectionWidth * 4.5,
         y: 100,
         id: 5,
         imagePath: "/pic/r1-e6.jpg",
-        caption:
-          "Bữa ăn hàng ngày của các phi công bị bắt tại Nhà tù Hỏa Lò ở Hà Nội.",
+        caption: "Bác Hồ kiên cường dưới lá cờ Tổ quốc",
       },
       {
         x: sectionWidth * 5.5,
         y: 100,
         id: 6,
         imagePath: "/pic/r1-e7.jpg",
-        caption:
-          "Thất bại của các cuộc không kích đã buộc Mỹ và tay sai phải ngồi vào bàn đàm phán năm 1973 và ký Hiệp định Paris, chấm dứt chiến tranh ở Việt Nam. Trong ảnh, bà Nguyễn Thị Bình, Bộ trưởng Ngoại giao Chính phủ Cách mạng Lâm thời Cộng hòa miền Nam Việt Nam, đã ký hiệp định vào ngày 27 tháng 1 năm 1973.",
+        caption: "Hành trình bôn ba tìm đường cứu nước của Bác Hồ",
       },
     ];
 

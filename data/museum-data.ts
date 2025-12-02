@@ -6,7 +6,7 @@ export const museumData: ExhibitData[] = [
     title: "Giai đoạn trước 1911: Hình thành tư tưởng yêu nước",
     position: { x: 300, y: 300 },
     roomNumber: 1,
-    image: "/pic/r1-e1.webp",
+    image: "/pic/r1-e1.jpg",
     content: `
 **Hồ Chí Minh** sinh ra trong gia đình nhà nho yêu nước tại **Nghệ An** – vùng đất giàu truyền thống chống ngoại xâm.
 
@@ -50,7 +50,7 @@ Trong hành trình qua nhiều châu lục, Hồ Chí Minh:
     title: "1920–1930: Xây dựng nền tảng tư tưởng cách mạng Việt Nam",
     position: { x: 300, y: 900 },
     roomNumber: 2,
-    image: "/pic/r2-e1.png",
+    image: "/pic/r2-e1.jpg",
     content: `
 Những đóng góp quan trọng của Hồ Chí Minh thập niên 1920:
 
